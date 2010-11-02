@@ -56,7 +56,6 @@ void test ( hashfunc<hashtype> hash, const char * hashname )
 
 	SparseKeyTest(hash,false);
 
-	//DictionaryTest(hash);
 	//BitrangeKeysetTest(hash,false);
 	//TextKeyTest(hash.m_hash);
 }
@@ -70,14 +69,6 @@ void main ( void )
 	SetProcessAffinityMask(GetCurrentProcess(),2);
 
 	int a = clock();
-
-#if 0
-
-	optimize_fmix64();
-
-	//scratchmain();
-
-#else
 
 	//----------
 
@@ -95,8 +86,6 @@ void main ( void )
 	//test<k128> ( MurmurHash3_128, "MurmurHash3 128-bit" );
 
 	//test<uint32_t>  ( MurmurHash3x64_32,  "MurmurHash3 32-bit" );
-
-#endif
 
 	int b = clock();
 

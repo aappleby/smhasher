@@ -320,50 +320,6 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Crypto"
-			>
-			<File
-				RelativePath=".\BlockCipher.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\BlockCipher.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Cipher.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Cipher.h"
-				>
-			</File>
-			<File
-				RelativePath=".\StreamCipher.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\StreamCipher.h"
-				>
-			</File>
-			<File
-				RelativePath=".\TEA.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\TEA.h"
-				>
-			</File>
-			<File
-				RelativePath=".\XTEA.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\XTEA.h"
-				>
-			</File>
-		</Filter>
-		<Filter
 			Name="Hashes"
 			>
 			<File
@@ -447,14 +403,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\DictionaryTest.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\DictionaryTest.h"
-				>
-			</File>
-			<File
 				RelativePath=".\DifferentialTest.cpp"
 				>
 			</File>
@@ -507,10 +455,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\simplex.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\Stats.cpp"
 				>
 			</File>
@@ -527,60 +471,12 @@
 				>
 			</File>
 		</Filter>
-		<Filter
-			Name="Junk"
-			>
-			<File
-				RelativePath=".\Diffusion.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Diffusion.h"
-				>
-			</File>
-			<File
-				RelativePath=".\FWTransform.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\FWTransform.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Hamming.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Hamming.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Junk.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Junk.h"
-				>
-			</File>
-			<File
-				RelativePath=".\SimAnneal.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\SimAnneal.h"
-				>
-			</File>
-		</Filter>
 		<File
 			RelativePath=".\main.cpp"
 			>
 		</File>
 		<File
 			RelativePath=".\pstdint.h"
-			>
-		</File>
-		<File
-			RelativePath=".\scratch.cpp"
 			>
 		</File>
 	</Files>
