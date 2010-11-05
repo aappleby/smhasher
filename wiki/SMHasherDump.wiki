@@ -1,5 +1,7 @@
 #summary Dump of all output for a test run of MurmurHash3 in all variants
 
+This test was produced by [SMHasher] running on an Intel Core 2 Quad Q9650 running at 3.0 ghz. The code is single-threaded and was restricted to running on a single core, which produces more repeatable results.
+
 {{{
 -------------------------------------------------------------------------------
 --- Testing MurmurHash3 for x86, 32-bit
