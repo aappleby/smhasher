@@ -2,6 +2,12 @@
 
 == Sanity Tests ==
 
+Hash functions must not do bad things -
+
+  * They must not read bytes before the beginning or past the end of the key they're hashing.
+  * They should process all bits of the key.
+  * They should always produce the same hash value given the same key.
+
 == Performance Tests ==
 
 Applications that use hash functions to generate semi-unique identifiers for large blocks of data care most about the bulk speed of a hash function, while applications that use hash functions to implement efficient hash tables for short keys care most about the total time needed to hash a key. SMHasher tests both -
