@@ -4,13 +4,15 @@
 
 [SMHasher]'s test functions can be broken down into 4 classes - 
 
-1. Performance. How fast can the hash function consume input, and how many cycles does it take to complete a hash?
+1. Sanity. Does the hash function work? Does it do bad things with its input?
 
-2. Distribution. How evenly are the hash values spread over the 2^N-bit space? Do any types of keys produce unevenly distributed hash values?
+2. Performance. How fast can the hash function consume input, and how many cycles does it take to complete a hash?
 
-3. Collision. How often do unrelated keys produce identical hash values? Is the probability of generating a collision in line with what would be expected due to statistics? Do any types of keys produce more collisions than expected?
+3. Differentials. How often do almost-but-not-quite identical keys produce identical hash values? What is the smallest difference between two keys that can possibly cause the hash function to produce identical values?
 
-4. Differentials. How often do almost-but-not-quite identical keys produce identical hash values? What is the smallest difference between two keys that can possibly cause the hash function to produce identical values?
+4. Keysets. Take a bunch of keys, hash them, and analyze the resulting hash values. How evenly are the hash values spread over the 2^N-bit space? How often do unrelated keys produce identical hash values, and does this occur more likely than would be expected due to statistics?
+
+To address #4, we generate a variety of different hard-to-hash keysets and run our collision & distribution tests against all of them.
 
 
 === Sanity Tests ===
