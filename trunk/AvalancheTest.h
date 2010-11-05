@@ -1,8 +1,227 @@
+//-----------------------------------------------------------------------------
+// Flipping a single bit of a key should cause an "avalanche" of changes in
+// the hash function's output. Ideally, each output bits should flip 50% of
+// the time - if the probability of an output bit flipping is not 50%, that bit
+// is "biased". Too much bias means that patterns applied to the input will
+// cause "echoes" of the patterns in the output, which in turn can cause the
+// hash function to fail to create an even, random distribution of hash values.
+
+
 #pragma once
 
 #include "Types.h"
+#include "Random.h"
+#include <vector>
+
+// Avalanche fails if a bit is biased by more than 1%
+
+#define AVALANCHE_FAIL 0.01
 
 double maxBias ( std::vector<int> & counts, int reps );
-double rmsBias ( std::vector<int> & counts, int reps );
 
-bool AvalancheTest ( pfHash hash, const int keybits, const int hashbits, const int reps );
+//-----------------------------------------------------------------------------
+
+template < typename keytype, typename hashtype >
+void calcBias ( pfHash hash, std::vector<int> & counts, int reps )
+{
+	const int keybytes = sizeof(keytype);
+	const int hashbytes = sizeof(hashtype);
+
+	const int keybits = keybytes * 8;
+	const int hashbits = hashbytes * 8;
+
+	keytype K;
+	hashtype A,B;
+
+	for(int irep = 0; irep < reps; irep++)
+	{
+		if(irep % (reps/10) == 0) printf(".");
+
+		rand_p(&K,keybytes);
+
+		hash(&K,keybytes,0,&A);
+
+		int * cursor = &counts[0];
+
+		for(int iBit = 0; iBit < keybits; iBit++)
+		{
+			flipbit(&K,keybytes,iBit);
+			hash(&K,keybytes,0,&B);
+			flipbit(&K,keybytes,iBit);
+
+			for(int iOut = 0; iOut < hashbits; iOut++)
+			{
+				int bitA = getbit(&A,hashbytes,iOut);
+				int bitB = getbit(&B,hashbytes,iOut);
+
+				(*cursor++) += (bitA ^ bitB);
+			}
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+
+template < typename keytype, typename hashtype >
+bool AvalancheTest ( pfHash hash, const int reps )
+{
+	const int keybytes = sizeof(keytype);
+	const int hashbytes = sizeof(hashtype);
+
+	const int keybits = keybytes * 8;
+	const int hashbits = hashbytes * 8;
+
+	printf("Testing %3d-bit keys -> %3d-bit hashes, %8d reps",keybits,hashbits,reps);
+
+	//----------
+
+	std::vector<int> bins(keybits*hashbits,0);
+
+	calcBias<keytype,hashtype>(hash,bins,reps);
+	
+	//----------
+
+	bool result = true;
+
+	double b = maxBias(bins,reps);
+
+	printf(" worst bias is %f%%",b * 100.0);
+
+	if(b > AVALANCHE_FAIL)
+	{
+		printf(" !!!!! ");
+		result = false;
+	}
+
+	printf("\n");
+
+	return result;
+}
+
+//----------------------------------------------------------------------------
+// Tests the Bit Independence Criteron. Stricter than Avalanche, but slow and
+// not really all that useful.
+
+template< typename keytype, typename hashtype >
+void BicTest ( pfHash hash, const int keybit, const int reps, double & maxBias, int & maxA, int & maxB, bool verbose )
+{
+	const int keybytes = sizeof(keytype);
+	const int hashbytes = sizeof(hashtype);
+	const int hashbits = hashbytes * 8;
+
+	std::vector<int> bins(hashbits*hashbits*4,0);
+
+	keytype key;
+	hashtype h1,h2;
+
+	for(int irep = 0; irep < reps; irep++)
+	{
+		if(verbose)
+		{
+			if(irep % (reps/10) == 0) printf(".");
+		}
+
+		rand_p(&key,keybytes);
+		hash(&key,keybytes,0,&h1);
+
+		flipbit(key,keybit);
+		hash(&key,keybytes,0,&h2);
+
+		keytype d = h1 ^ h2;
+
+		for(int out1 = 0; out1 < hashbits; out1++)
+		for(int out2 = 0; out2 < hashbits; out2++)
+		{
+			if(out1 == out2) continue;
+
+			uint32_t b = getbit(d,out1) | (getbit(d,out2) << 1);
+
+			bins[(out1 * hashbits + out2) * 4 + b]++;
+		}
+	}
+
+	if(verbose) printf("\n");
+
+	maxBias = 0;
+
+	for(int out1 = 0; out1 < hashbits; out1++)
+	{
+		for(int out2 = 0; out2 < hashbits; out2++)
+		{
+			if(out1 == out2)
+			{
+				if(verbose) printf("\\");
+				continue;
+			}
+
+			double bias = 0;
+
+			for(int b = 0; b < 4; b++)
+			{
+				double b2 = double(bins[(out1 * hashbits + out2) * 4 + b]) / double(reps / 2);
+				b2 = fabs(b2 * 2 - 1);
+
+				if(b2 > bias) bias = b2;
+			}
+
+			if(bias > maxBias)
+			{
+				maxBias = bias;
+				maxA = out1;
+				maxB = out2;
+			}
+
+			if(verbose) 
+			{
+				if     (bias < 0.01) printf(".");
+				else if(bias < 0.05) printf("o");
+				else if(bias < 0.33) printf("O");
+				else                 printf("X");
+			}
+		}
+
+		if(verbose) printf("\n");
+	}
+}
+
+//----------
+
+template< typename keytype, typename hashtype >
+bool BicTest ( pfHash hash, const int reps )
+{
+	const int keybytes = sizeof(keytype);
+	const int keybits = keybytes * 8;
+
+	double maxBias = 0;
+	int maxK = 0;
+	int maxA = 0;
+	int maxB = 0;
+
+	for(int i = 0; i < keybits; i++)
+	{
+		if(i % (keybits/10) == 0) printf(".");
+
+		double bias;
+		int a,b;
+		
+		BicTest<keytype,hashtype>(hash,i,reps,bias,a,b,false);
+
+		if(bias > maxBias)
+		{
+			maxBias = bias;
+			maxK = i;
+			maxA = a;
+			maxB = b;
+		}
+	}
+
+	printf("Max bias %f - (%3d : %3d,%3d)\n",maxBias,maxK,maxA,maxB);
+
+	// Bit independence is harder to pass than avalanche, so we're a bit more lax here.
+
+	bool result = (maxBias < 0.05);
+
+	return result;
+}
+
+//-----------------------------------------------------------------------------

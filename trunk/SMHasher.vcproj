@@ -395,14 +395,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CycleTest.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CycleTest.h"
-				>
-			</File>
-			<File
 				RelativePath=".\DifferentialTest.cpp"
 				>
 			</File>
@@ -411,19 +403,19 @@
 				>
 			</File>
 			<File
-				RelativePath=".\SparseKeyTest.cpp"
+				RelativePath=".\KeysetTest.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\SparseKeyTest.h"
+				RelativePath=".\KeysetTest.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Tests.cpp"
+				RelativePath=".\SpeedTest.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Tests.h"
+				RelativePath=".\SpeedTest.h"
 				>
 			</File>
 		</Filter>
@@ -439,11 +431,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Core.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Core.h"
+				RelativePath=".\pstdint.h"
 				>
 			</File>
 			<File
@@ -473,10 +461,6 @@
 		</Filter>
 		<File
 			RelativePath=".\main.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\pstdint.h"
 			>
 		</File>
 	</Files>

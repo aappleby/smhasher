@@ -5,9 +5,23 @@
 //----------------------------------------------------------------------------
 // fake / bad hashes
 
-void randhash ( const void *, int, uint32_t, void * out )
+void randhash_32 ( const void *, int, uint32_t, void * out )
 {
-	*(uint32_t*)out = rand_u32();
+	((uint32_t*)out)[0] = rand_u32();
+}
+
+void randhash_64 ( const void *, int, uint32_t, void * out )
+{
+	((uint32_t*)out)[0] = rand_u32();
+	((uint32_t*)out)[1] = rand_u32();
+}
+
+void randhash_128 ( const void *, int, uint32_t, void * out )
+{
+	((uint32_t*)out)[0] = rand_u32();
+	((uint32_t*)out)[1] = rand_u32();
+	((uint32_t*)out)[2] = rand_u32();
+	((uint32_t*)out)[3] = rand_u32();
 }
 
 void BadHash ( const void * key, int len, uint32_t seed, void * out )

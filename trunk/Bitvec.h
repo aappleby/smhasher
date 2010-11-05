@@ -6,12 +6,6 @@
 
 //-----------------------------------------------------------------------------
 
-uint32_t parity      ( uint32_t v );
-uint64_t parity      ( uint64_t v );
-
-uint32_t popcount    ( uint32_t v );
-uint32_t popcount128 ( uint32_t * v );
-
 void     printbits   ( void * blob, int len );
 void     printhex32  ( void * blob, int len );
 
@@ -25,6 +19,38 @@ void     clearbit    ( void * blob, int len, uint32_t bit );
 
 void     flipbit     ( void * blob, int len, uint32_t bit );
 
+//----------
+
+template< typename T >
+inline uint32_t getbit ( T & blob, uint32_t bit )
+{
+	return getbit(&blob,sizeof(blob),bit);
+}
+
+template<> inline uint32_t getbit ( uint32_t & blob, uint32_t bit ) { return (blob >> (bit & 31)) & 1; }
+template<> inline uint32_t getbit ( uint64_t & blob, uint32_t bit ) { return (blob >> (bit & 63)) & 1; }
+
+//----------
+
+template< typename T >
+inline void setbit ( T & blob, uint32_t bit )
+{
+	return setbit(&blob,sizeof(blob),bit);
+}
+
+template<> inline void setbit ( uint32_t & blob, uint32_t bit ) { blob |= uint32_t(1) << (bit & 31); }
+template<> inline void setbit ( uint64_t & blob, uint32_t bit ) { blob |= uint64_t(1) << (bit & 63); }
+
+//----------
+
+template< typename T >
+inline void flipbit ( T & blob, uint32_t bit )
+{
+	flipbit(&blob,sizeof(blob),bit);
+}
+
+template<> inline void flipbit ( uint32_t & blob, uint32_t bit ) { bit &= 31; blob ^= (uint32_t(1) << bit); }
+template<> inline void flipbit ( uint64_t & blob, uint32_t bit ) { bit &= 63; blob ^= (uint64_t(1) << bit); }
 
 //-----------------------------------------------------------------------------
 // Left and right shift of blobs. The shift(N) versions work on chunks of N
@@ -42,11 +68,11 @@ inline void lshift ( void * blob, int len, int c )
 {
 	if((len & 3) == 0)
 	{
-		lshift32(&blob,len,c);
+		lshift32(blob,len,c);
 	}
 	else
 	{
-		lshift8(&blob,len,c);
+		lshift8(blob,len,c);
 	}
 }
 
@@ -54,11 +80,11 @@ inline void rshift ( void * blob, int len, int c )
 {
 	if((len & 3) == 0)
 	{
-		rshift32(&blob,len,c);
+		rshift32(blob,len,c);
 	}
 	else
 	{
-		rshift8(&blob,len,c);
+		rshift8(blob,len,c);
 	}
 }
 
@@ -104,6 +130,30 @@ void lrot32   ( void * blob, int len, int c );
 void rrot1    ( void * blob, int len, int c );
 void rrot8    ( void * blob, int len, int c );
 void rrot32   ( void * blob, int len, int c );
+
+inline void lrot ( void * blob, int len, int c )
+{
+	if((len & 3) == 0)
+	{
+		return lrot32(blob,len,c);
+	}
+	else
+	{
+		return lrot8(blob,len,c);
+	}
+}
+
+inline void rrot ( void * blob, int len, int c )
+{
+	if((len & 3) == 0)
+	{
+		return rrot32(blob,len,c);
+	}
+	else
+	{
+		return rrot8(blob,len,c);
+	}
+}
 
 template < typename T >
 inline void lrot ( T & blob, int c )
@@ -155,7 +205,6 @@ inline uint32_t window ( void * blob, int len, int start, int count )
 	}
 }
 
-/*
 template < typename T >
 inline uint32_t window ( T & blob, int start, int count )
 {
@@ -168,15 +217,14 @@ inline uint32_t window ( T & blob, int start, int count )
 		return window8(&blob,sizeof(T),start,count);
 	}
 }
-*/
 
-// template<> 
+template<> 
 inline uint32_t window ( uint32_t & blob, int start, int count )
 {
 	return _rotr(blob,start) & ((1<<count)-1);
 }
 
-// template<> 
+template<> 
 inline uint32_t window ( uint64_t & blob, int start, int count )
 {
 	return (uint32_t)_rotr64(blob,start) & ((1<<count)-1);
