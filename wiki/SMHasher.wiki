@@ -34,6 +34,10 @@ To determine how fast a hash function can completely hash a key (including funct
 
 For all possible small N-bit subsets of a M-bit key, generate 1000 random key pairs that differ in only those N bits and see if any of them hash to the same value. If so, those N bits tend to cancel out inside the hash function and generate more collisions than expected.
 
+SMHasher tests all 5-bit differentials for 64-bit keys, all 4-bit differentials for 128-bit keys, and all 3-bit differentials for 256-bit keys. The number of differentials is very large (millions) and we do 1000 tests per differential, so in the case of a 32-bit hash value we're quite likely to see random collisions. 
+
+Because of this, SMHasher reports only collisions that occur more than once - the likelihood of seeing more than one collision is so astronomically unlikely that these multi-collisions are almost definitely the sign of a bad differential that the hash function handles poorly.
+
 SuperFastHash fails this test badly - a large number of N-bit patterns can cause collisions with high (over 50% in some cases) probability.
 
 
