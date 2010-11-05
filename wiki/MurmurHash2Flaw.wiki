@@ -1,6 +1,6 @@
 #summary The flaw in MurmurHash2
 
-Let's look at what happens in Murmur2's inner loop when processing 'bad' keys of the form "uint32_t key\[2\] = {x,x};" -
+Let's look at what happens in Murmur2's inner loop when processing 'bad' keys of the form "`uint32_t key[2] = {x,x};`" -
 
 Here's the loop as written
 {{{
