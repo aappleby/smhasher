@@ -6,7 +6,26 @@ MurmurHash3 comes in 4 variants - 32/64/128-bit version for 32-bit platforms, an
 
 == Details ==
 
-Here are some brief test results, all produced using the [SMHasher] test suite on a single core of an Intel Core 2 Quad @ 3 gigahertz -
+Murmur3's mix functions are based on this snippet - 
+
+{{{
+k1 *= c1; 
+k1  = _rotl(k1,11); 
+k1 *= c2;
+h1 ^= k1;
+	
+h1 = h1*3+0x52dce729;
+
+c1 = c1*5+0x7b7d159c;
+c2 = c2*5+0x6bce6396;
+}}}
+
+'k' is a block of the key, 'h' is a block of the hash state, and 'c1' and 'c2' are two dynamic mixing constants.
+
+For each block of the key, we pre-mix it, combine it with the hash block, mix the hash block, and then mix the two constants we used to mix the key block.
+
+The changing mix constants help ensure that each key block is mixed in a slightly different way, which serves as a 'pattern breaker' - repeated key blocks don't all affect the hash value in the same way, which makes it much less likely that small changes in those blocks can cancel each other out. This improves collision resistance by a significant factor, and makes an otherwise weak-but-fast mix function quite robust.
+
 
 == Bulk speed test, hashing an 8-byte-aligned 256k block ==
 
