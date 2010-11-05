@@ -6,12 +6,13 @@ MurmurHash3 comes in 4 variants - 32/64/128-bit version for 32-bit platforms, an
 
 == Details ==
 
-Murmur3's mix functions are based on this snippet - 
+MurmurHash3's mix functions are based on this snippet - 
 
 {{{
 k1 *= c1; 
 k1  = _rotl(k1,11); 
 k1 *= c2;
+
 h1 ^= k1;
 	
 h1 = h1*3+0x52dce729;
@@ -22,9 +23,13 @@ c2 = c2*5+0x6bce6396;
 
 'k' is a block of the key, 'h' is a block of the hash state, and 'c1' and 'c2' are two dynamic mixing constants.
 
-For each block of the key, we pre-mix it, combine it with the hash block, mix the hash block, and then mix the two constants we used to mix the key block.
+For each block of the key, we pre-mix it using the two constants and a rotate, xor it into the hash block, mix the hash block, and then mix the two constants we used to mix the key block.
 
 The changing mix constants help ensure that each key block is mixed in a slightly different way, which serves as a 'pattern breaker' - repeated key blocks don't all affect the hash value in the same way, which makes it much less likely that small changes in those blocks can cancel each other out. This improves collision resistance by a significant factor, and makes an otherwise weak-but-fast mix function quite robust.
+
+The 'x = x*n+c' operations are also weak, mixing-wise, but a modern optimizing x86/x64 compiler will convert them into a single 'lea' instruction if the 'n' value is 3, 5, or 9 and the 'c' value is less than 0x8000000. The 'lea' instruction can be evaluated in the CPU pipeline in parallel with some of the multiply and rotate instructions, which makes for a very very fast overall mix.
+
+One downside of the weak-ish mix and the constantly changing 'c1' and 'c2' constants is that it is hard to guarantee that a particular block of the key will be mixed sufficiently before it leaves the hash function - to ensure that the output of the hash function always [avalanche]s, MurmurHash3 adds a stronger finalization step that guarantees that all bits of the input affect all bits of the output equally to within a very small percentage of ideal randomness.
 
 
 == Bulk speed test, hashing an 8-byte-aligned 256k block ==
