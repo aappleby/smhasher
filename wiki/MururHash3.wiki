@@ -2,7 +2,7 @@
 
 = Introduction =
 
-MurmurHash3? comes in 4 variants - 32/64/128-bit version for 32-bit platforms, and a 128-bit version for 64-bit platforms. The 32- and 64-bit versions for 64-bit platforms just use a subset of the 128-bit result - this was faster than trying to make specialized versions for each hash size.
+MurmurHash3 comes in 4 variants - 32/64/128-bit version for 32-bit platforms, and a 128-bit version for 64-bit platforms. The 32- and 64-bit versions for 64-bit platforms just use a subset of the 128-bit result - this was faster than trying to make specialized versions for each hash size.
 
 = Details =
 
