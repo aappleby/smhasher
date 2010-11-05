@@ -2,49 +2,19 @@
 
 #include <stdlib.h>    // for _rotl
 
-#pragma warning(disable:4100)
-
 //-----------------------------------------------------------------------------
-// need to replace this
+// Block read - if your platform needs to do endian-swapping or can only
+// handle aligned reads, do the conversion here
 
-inline uint32_t kmix ( uint32_t k, uint32_t c1, uint32_t c2 ) 
+inline uint32_t getblock ( const uint32_t * p, int i )
 {
-	k *= c1; 
-	k  = _rotl(k,11); 
-	k *= c2;
-
-	return k;
+	return p[i];
 }
 
-// block mix
+//----------
+// Finalization mix - force all bits of a hash block to avalanche
 
-inline void bmix1 ( uint32_t & h, uint32_t k, uint32_t c1, uint32_t c2 )
-{
-	k = kmix(k,c1,c2);
-	
-	h = h*5+0xa6b84e31;
-	h ^= k;
-}
-
-// xor before mul is faster on x64
-
-inline void bmix2 ( uint32_t & h, uint32_t k, uint32_t c1, uint32_t c2 )
-{
-	k = kmix(k,c1,c2);
-	
-	h ^= k;
-	h = h*3+0xa6b84e31;
-}
-
-// block constant mix
-
-inline void cmix ( uint32_t & c1, uint32_t & c2 )
-{
-	c1 = c1*9+0x273581d8;
-	c2 = c2*5+0xee700bac;
-}
-
-// finalizer mix - avalanches all bits to within 0.25% bias
+// avalanches all bits to within 0.25% bias
 
 inline uint32_t fmix32 ( uint32_t h )
 {
@@ -57,7 +27,325 @@ inline uint32_t fmix32 ( uint32_t h )
 	return h;
 }
 
-// 64-bit finalizer mix - avalanches all bits to within 0.05% bias
+//-----------------------------------------------------------------------------
+
+inline void bmix32 ( uint32_t & h1, uint32_t & k1, uint32_t & c1, uint32_t & c2 )
+{
+	k1 *= c1; 
+	k1  = _rotl(k1,11); 
+	k1 *= c2;
+	h1 ^= k1;
+	
+	h1 = h1*3+0x52dce729;
+
+	c1 = c1*5+0x7b7d159c;
+	c2 = c2*5+0x6bce6396;
+}
+
+//----------
+
+void MurmurHash3_x86_32 ( const void * key, int len, uint32_t seed, void * out )
+{
+	const uint8_t * data = (const uint8_t*)key;
+	const int nblocks = len / 4;
+
+	uint32_t h1 = 0x971e137b ^ seed;
+
+	uint32_t c1 = 0x95543787;
+	uint32_t c2 = 0x2ad7eb25;
+
+	//----------
+	// body
+
+	const uint32_t * blocks = (const uint32_t *)(data + nblocks*4);
+
+	for(int i = -nblocks; i; i++)
+	{
+		uint32_t k1 = getblock(blocks,i);
+
+		bmix32(h1,k1,c1,c2);
+	}
+
+	//----------
+	// tail
+
+	const uint8_t * tail = (const uint8_t*)(data + nblocks*4);
+
+	uint32_t k1 = 0;
+
+	switch(len & 3)
+	{
+	case 3: k1 ^= tail[2] << 16;
+	case 2: k1 ^= tail[1] << 8;
+	case 1: k1 ^= tail[0];
+			bmix32(h1,k1,c1,c2);
+	};
+
+	//----------
+	// finalization
+
+	h1 ^= len;
+
+	h1 = fmix32(h1);
+
+	*(uint32_t*)out = h1;
+} 
+
+//-----------------------------------------------------------------------------
+
+inline void bmix32 ( uint32_t & h1, uint32_t & h2, uint32_t & k1, uint32_t & k2, uint32_t & c1, uint32_t & c2 )
+{
+	k1 *= c1; 
+	k1  = _rotl(k1,11); 
+	k1 *= c2;
+	h1 ^= k1;
+	h1 += h2;
+
+	h2 = _rotl(h2,17);
+
+	k2 *= c2; 
+	k2  = _rotl(k2,11);
+	k2 *= c1;
+	h2 ^= k2;
+	h2 += h1;
+
+	h1 = h1*3+0x52dce729;
+	h2 = h2*3+0x38495ab5;
+
+	c1 = c1*5+0x7b7d159c;
+	c2 = c2*5+0x6bce6396;
+}
+
+//----------
+
+void MurmurHash3_x86_64 ( const void * key, const int len, const uint32_t seed, void * out )
+{
+	const uint8_t * data = (const uint8_t*)key;
+	const int nblocks = len / 8;
+
+	uint32_t h1 = 0x8de1c3ac ^ seed;
+	uint32_t h2 = 0xbab98226 ^ seed;
+
+	uint32_t c1 = 0x95543787;
+	uint32_t c2 = 0x2ad7eb25;
+
+	//----------
+	// body
+
+	const uint32_t * blocks = (const uint32_t *)(data + nblocks*8);
+
+	for(int i = -nblocks; i; i++)
+	{
+		uint32_t k1 = getblock(blocks,i*2+0);
+		uint32_t k2 = getblock(blocks,i*2+1);
+
+		bmix32(h1,h2,k1,k2,c1,c2);
+	}
+
+	//----------
+	// tail
+	
+	const uint8_t * tail = (const uint8_t*)(data + nblocks*8);
+
+	uint32_t k1 = 0;
+	uint32_t k2 = 0;
+
+	switch(len & 7)
+	{
+	case 7: k2 ^= tail[6] << 16;
+	case 6: k2 ^= tail[5] << 8;
+	case 5: k2 ^= tail[4] << 0;
+	case 4: k1 ^= tail[3] << 24;
+	case 3: k1 ^= tail[2] << 16;
+	case 2: k1 ^= tail[1] << 8;
+	case 1: k1 ^= tail[0] << 0;
+	        bmix32(h1,h2,k1,k2,c1,c2);
+	};
+
+	//----------
+	// finalization
+
+	h2 ^= len;
+
+	h1 += h2;
+	h2 += h1;
+
+	h1 = fmix32(h1);
+	h2 = fmix32(h2);
+
+	h1 += h2;
+	h2 += h1;
+
+	((uint32_t*)out)[0] = h1;
+	((uint32_t*)out)[1] = h2;
+}
+
+//-----------------------------------------------------------------------------
+// This mix is large enough that VC++ refuses to inline it unless we use
+// __forceinline. It's also not all that fast due to register spillage.
+
+__forceinline void bmix32 ( uint32_t & h1, uint32_t & h2, uint32_t & h3, uint32_t & h4, 
+						    uint32_t & k1, uint32_t & k2, uint32_t & k3, uint32_t & k4, 
+						    uint32_t & c1, uint32_t & c2 )
+{
+	k1 *= c1; 
+	k1  = _rotl(k1,11); 
+	k1 *= c2;
+	h1 ^= k1;
+	h1 += h2;
+	h1 += h3;
+	h1 += h4;
+
+	k2 *= c2; 
+	k2  = _rotl(k2,11);
+	k2 *= c1;
+	h2 ^= k2;
+	h2 += h1;
+
+	h1 = h1*3+0x52dce729;
+	h2 = h2*3+0x38495ab5;
+
+	c1 = c1*5+0x7b7d159c;
+	c2 = c2*5+0x6bce6396;
+
+	k3 *= c1; 
+	k3  = _rotl(k3,11); 
+	k3 *= c2;
+	h3 ^= k3;
+	h3 += h1;
+
+	k4 *= c2; 
+	k4  = _rotl(k4,11);
+	k4 *= c1;
+	h4 ^= k4;
+	h4 += h1;
+
+	h3 = h3*3+0x52dce729;
+	h4 = h4*3+0x38495ab5;
+
+	c1 = c1*5+0x7b7d159c;
+	c2 = c2*5+0x6bce6396;
+}
+
+//----------
+
+void MurmurHash3_x86_128 ( const void * key, const int len, const uint32_t seed, void * out )
+{
+	const uint8_t * data = (const uint8_t*)key;
+	const int nblocks = len / 16;
+
+	uint32_t h1 = 0x8de1c3ac ^ seed;
+	uint32_t h2 = 0xbab98226 ^ seed;
+	uint32_t h3 = 0xfcba5b2d ^ seed;
+	uint32_t h4 = 0x32452e3e ^ seed;
+
+	uint32_t c1 = 0x95543787;
+	uint32_t c2 = 0x2ad7eb25;
+
+	//----------
+	// body
+
+	const uint32_t * blocks = (const uint32_t *)(data);
+
+	for(int i = 0; i < nblocks; i++)
+	{
+		uint32_t k1 = getblock(blocks,i*4+0);
+		uint32_t k2 = getblock(blocks,i*4+1);
+		uint32_t k3 = getblock(blocks,i*4+2);
+		uint32_t k4 = getblock(blocks,i*4+3);
+
+		bmix32(h1,h2,h3,h4, k1,k2,k3,k4, c1,c2);
+	}
+
+	//----------
+	// tail
+
+	const uint8_t * tail = (const uint8_t*)(data + nblocks*16);
+
+	uint32_t k1 = 0;
+	uint32_t k2 = 0;
+	uint32_t k3 = 0;
+	uint32_t k4 = 0;
+
+	switch(len & 15)
+	{
+	case 15: k4 ^= tail[14] << 16;
+	case 14: k4 ^= tail[13] << 8;
+	case 13: k4 ^= tail[12] << 0;
+	case 12: k3 ^= tail[11] << 24;
+	case 11: k3 ^= tail[10] << 16;
+	case 10: k3 ^= tail[ 9] << 8;
+	case  9: k3 ^= tail[ 8] << 0;
+	case  8: k2 ^= tail[ 7] << 24;
+	case  7: k2 ^= tail[ 6] << 16;
+	case  6: k2 ^= tail[ 5] << 8;
+	case  5: k2 ^= tail[ 4] << 0;
+	case  4: k1 ^= tail[ 3] << 24;
+	case  3: k1 ^= tail[ 2] << 16;
+	case  2: k1 ^= tail[ 1] << 8;
+	case  1: k1 ^= tail[ 0] << 0;
+	         bmix32(h1,h2,h3,h4, k1,k2,k3,k4, c1,c2);
+	};
+
+	//----------
+	// finalization
+
+	h4 ^= len;
+
+	h1 += h2; h1 += h3; h1 += h4;
+	h2 += h1; h3 += h1; h4 += h1;
+
+	h1 = fmix32(h1);
+	h2 = fmix32(h2);
+	h3 = fmix32(h3);
+	h4 = fmix32(h4);
+
+	h1 += h2; h1 += h3; h1 += h4;
+	h2 += h1; h3 += h1; h4 += h1;
+
+	((uint32_t*)out)[0] = h1;
+	((uint32_t*)out)[1] = h2;
+	((uint32_t*)out)[2] = h3;
+	((uint32_t*)out)[3] = h4;
+}
+
+//-----------------------------------------------------------------------------
+// Block read - if your platform needs to do endian-swapping or can only
+// handle aligned reads, do the conversion here
+
+inline uint64_t getblock ( const uint64_t * p, int i )
+{
+	return p[i];
+}
+
+//----------
+// Block mix - combine the key bits with the hash bits and scramble everything
+
+inline void bmix64 ( uint64_t & h1, uint64_t & h2, uint64_t & k1, uint64_t & k2, uint64_t & c1, uint64_t & c2 )
+{
+	k1 *= c1; 
+	k1  = _rotl64(k1,23); 
+	k1 *= c2;
+	h1 ^= k1;
+	h1 += h2;
+
+	h2 = _rotl64(h2,41);
+
+	k2 *= c2; 
+	k2  = _rotl64(k2,23);
+	k2 *= c1;
+	h2 ^= k2;
+	h2 += h1;
+
+	h1 = h1*3+0x52dce729;
+	h2 = h2*3+0x38495ab5;
+
+	c1 = c1*5+0x7b7d159c;
+	c2 = c2*5+0x6bce6396;
+}
+
+//----------
+// Finalization mix - avalanches all bits to within 0.05% bias
 
 inline uint64_t fmix64 ( uint64_t k )
 {
@@ -70,219 +358,101 @@ inline uint64_t fmix64 ( uint64_t k )
 	return k;
 }
 
-//-----------------------------------------------------------------------------
+//----------
 
-void MurmurHash3_x86_32 ( const void * key, int len, uint32_t seed, void * out )
+void MurmurHash3_x64_128 ( const void * key, const int len, const uint32_t seed, void * out )
 {
-	uint32_t h = 0x971e137b ^ seed;
+	const uint8_t * data = (const uint8_t*)key;
+	const int nblocks = len / 16;
 
-	const uint8_t * tail = (const uint8_t*)(key) + (len & ~3);
+	uint64_t h1 = 0x9368e53c2f6af274 ^ seed;
+	uint64_t h2 = 0x586dcd208f7cd3fd ^ seed;
+
+	uint64_t c1 = 0x87c37b91114253d5;
+	uint64_t c2 = 0x4cf5ad432745937f;
 
 	//----------
 	// body
 
-	const uint32_t * block = (const uint32_t *)tail;
+	const uint64_t * blocks = (const uint64_t *)(data);
 
-	uint32_t c1 = 0x95543787;
-	uint32_t c2 = 0x2ad7eb25;
-
-	for(int l = -(len/4); l; l++)
+	for(int i = 0; i < nblocks; i++)
 	{
-		bmix1(h,block[l],c1,c2);
-		cmix(c1,c2);
+		uint64_t k1 = getblock(blocks,i*2+0);
+		uint64_t k2 = getblock(blocks,i*2+1);
+
+		bmix64(h1,h2,k1,k2,c1,c2);
 	}
 
 	//----------
 	// tail
 
-	uint32_t k = 0;
+	const uint8_t * tail = (const uint8_t*)(data + nblocks*16);
 
-	switch(len & 3)
+	uint64_t k1 = 0;
+	uint64_t k2 = 0;
+
+	switch(len & 15)
 	{
-	case 3: k ^= tail[2] << 16;
-	case 2: k ^= tail[1] << 8;
-	case 1: k ^= tail[0];
-			bmix1(h,k,c1,c2);
+	case 15: k2 ^= uint64_t(tail[14]) << 48;
+	case 14: k2 ^= uint64_t(tail[13]) << 40;
+	case 13: k2 ^= uint64_t(tail[12]) << 32;
+	case 12: k2 ^= uint64_t(tail[11]) << 24;
+	case 11: k2 ^= uint64_t(tail[10]) << 16;
+	case 10: k2 ^= uint64_t(tail[ 9]) << 8;
+	case  9: k2 ^= uint64_t(tail[ 8]) << 0;
+
+	case  8: k1 ^= uint64_t(tail[ 7]) << 56;
+	case  7: k1 ^= uint64_t(tail[ 6]) << 48;
+	case  6: k1 ^= uint64_t(tail[ 5]) << 40;
+	case  5: k1 ^= uint64_t(tail[ 4]) << 32;
+	case  4: k1 ^= uint64_t(tail[ 3]) << 24;
+	case  3: k1 ^= uint64_t(tail[ 2]) << 16;
+	case  2: k1 ^= uint64_t(tail[ 1]) << 8;
+	case  1: k1 ^= uint64_t(tail[ 0]) << 0;
+	         bmix64(h1,h2,k1,k2,c1,c2);
 	};
 
 	//----------
 	// finalization
 
-	h ^= len;
+	h2 ^= len;
 
-	h = fmix32(h);
+	h1 += h2;
+	h2 += h1;
 
-	*(uint32_t*)out = h;
+	h1 = fmix64(h1);
+	h2 = fmix64(h2);
+
+	h1 += h2;
+	h2 += h1;
+
+	((uint64_t*)out)[0] = h1;
+	((uint64_t*)out)[1] = h2;
+}
+
+//-----------------------------------------------------------------------------
+// If we need a smaller hash value, it's faster to just use a portion of the 
+// 128-bit hash
+
+void MurmurHash3_x64_32 ( const void * key, int len, uint32_t seed, void * out )
+{
+	uint32_t temp[4];
+
+	MurmurHash3_x64_128(key,len,seed,temp);
+
+	*(uint32_t*)out = temp[0];
+}
+
+//----------
+
+void MurmurHash3_x64_64 ( const void * key, int len, uint32_t seed, void * out )
+{
+	uint64_t temp[2];
+
+	MurmurHash3_x64_128(key,len,seed,temp);
+
+	*(uint64_t*)out = temp[0];
 } 
 
 //-----------------------------------------------------------------------------
-
-void merge64 ( uint32_t h[2], const uint32_t * blocks, uint32_t c1, uint32_t c2 )
-{
-	h[0] = _rotl(h[0],9);
-	h[1] = _rotl(h[1],24);
-
-	h[0] += h[1];
-	h[1] += h[0];
-
-	bmix1(h[0],blocks[0],c1,c2);
-	bmix1(h[1],blocks[1],c1,c2);
-}
-
-//----------
-
-void MurmurHash3_x86_64 ( const void * data, int len, uint32_t seed, void * out )
-{
-	uint32_t h[2];
-
-	h[0] = 0x8de1c3ac ^ seed;
-	h[1] = 0xbab98226 ^ seed;
-
-	//----------
-	// body
-
-	const uint32_t * blocks = (const uint32_t *)data;
-
-	uint32_t c1 = 0x95543787;
-	uint32_t c2 = 0x2ad7eb25;
-
-	while(len >= 8)
-	{
-		merge64(h,blocks,c1,c2);
-		cmix(c1,c2);
-
-		blocks += 2;
-		len -= 8;
-	}
-
-	//----------
-	// tail
-	
-	uint32_t k[2] = { 0, 0 };
-
-	const uint8_t * tail = (const uint8_t*)blocks;
-
-	switch(len)
-	{
-	case 7: k[1] ^= tail[6] << 16;
-	case 6: k[1] ^= tail[5] << 8;
-	case 5: k[1] ^= tail[4] << 0;
-	case 4: k[0] ^= tail[3] << 24;
-	case 3: k[0] ^= tail[2] << 16;
-	case 2: k[0] ^= tail[1] << 8;
-	case 1: k[0] ^= tail[0] << 0;
-			merge64(h,k,c1,c2);
-	};
-
-	//----------
-	// finalization
-
-	h[1] ^= len;
-
-	h[0] =  fmix32(h[0]);
-	h[1] ^= kmix(h[0],c1,c2);
-	h[0] ^= fmix32(h[1]);
-	h[1] ^= kmix(h[0],c1,c2);
-
-	((uint32_t*)out)[0] = h[0];
-	((uint32_t*)out)[1] = h[1];
-}
-
-//-----------------------------------------------------------------------------
-
-void merge128 ( uint32_t h[4], const uint32_t * blocks, uint32_t c1, uint32_t c2 )
-{
-	h[0] = _rotl(h[0],3);
-	h[1] = _rotl(h[1],10);
-	h[2] = _rotl(h[2],19);
-	h[3] = _rotl(h[3],26);
-
-	h[0] += h[1];
-	h[0] += h[2];
-	h[0] += h[3];
-
-	h[1] += h[0];
-	h[2] += h[0];
-	h[3] += h[0];
-
-	bmix1(h[0],blocks[0],c1,c2);
-	bmix1(h[1],blocks[1],c1,c2);
-	bmix1(h[2],blocks[2],c1,c2);
-	bmix1(h[3],blocks[3],c1,c2);
-}
-
-//----------
-
-void MurmurHash3_x86_128 ( const void * data, int len, uint32_t seed, uint32_t * out )
-{
-	uint32_t h[4] =
-	{
-		0x8de1c3ac ^ seed,
-		0xbab98226 ^ seed,
-		0xfcba5b2d ^ seed,
-		0x32452e3e ^ seed
-	};
-
-	//----------
-	// body
-
-	const uint32_t * blocks = (const uint32_t *)data;
-
-	uint32_t c1 = 0x95543787;
-	uint32_t c2 = 0x2ad7eb25;
-
-	while(len >= 16)
-	{
-		merge128(h,blocks,c1,c2);
-		cmix(c1,c2);
-
-		blocks += 4;
-		len -= 16;
-	}
-
-	//----------
-	// tail
-
-	uint32_t k[4] = { 0, 0, 0, 0 };
-
-	const uint8_t * tail = (const uint8_t*)blocks;
-
-	switch(len)
-	{
-	case 15: k[3] ^= tail[14] << 16;
-	case 14: k[3] ^= tail[13] << 8;
-	case 13: k[3] ^= tail[12] << 0;
-	case 12: k[2] ^= tail[11] << 24;
-	case 11: k[2] ^= tail[10] << 16;
-	case 10: k[2] ^= tail[ 9] << 8;
-	case  9: k[2] ^= tail[ 8] << 0;
-	case  8: k[1] ^= tail[ 7] << 24;
-	case  7: k[1] ^= tail[ 6] << 16;
-	case  6: k[1] ^= tail[ 5] << 8;
-	case  5: k[1] ^= tail[ 4] << 0;
-	case  4: k[0] ^= tail[ 3] << 24;
-	case  3: k[0] ^= tail[ 2] << 16;
-	case  2: k[0] ^= tail[ 1] << 8;
-	case  1: k[0] ^= tail[ 0] << 0;
-			merge128(h,k,c1,c2);
-	};
-
-	//----------
-	// finalization
-
-	h[3] ^= len;
-
-	h[0] ^= fmix32(h[1]); h[2] ^= fmix32(h[3]);
-	h[1] ^= kmix(h[0],c1,c2); h[3] ^= kmix(h[2],c1,c2);
-	h[3] ^= fmix32(h[0]); h[1] ^= fmix32(h[2]);
-	h[0] ^= kmix(h[3],c1,c2); h[2] ^= kmix(h[1],c1,c2);
-	h[1] ^= fmix32(h[0]); h[3] ^= fmix32(h[2]);
-
-	out[0] = h[0];
-	out[1] = h[1];
-	out[2] = h[2];
-	out[3] = h[3];
-}
-
-//-----------------------------------------------------------------------------
-

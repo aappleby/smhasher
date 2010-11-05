@@ -71,53 +71,6 @@ void printhex32 ( void * blob, int len )
 	printf("}");
 }
 
-
-//-----------------------------------------------------------------------------
-// Bit-level manipulation
-
-// These are from the "Bit Twiddling Hacks" webpage
-
-uint32_t popcount ( uint32_t v )
-{
-	v = v - ((v >> 1) & 0x55555555);                    // reuse input as temporary
-	v = (v & 0x33333333) + ((v >> 2) & 0x33333333);     // temp
-	uint32_t c = ((v + (v >> 4) & 0xF0F0F0F) * 0x1010101) >> 24; // count
-
-	return c;
-}
-
-uint32_t popcount128 ( uint32_t * v )
-{
-	uint32_t c = popcount(v[0]);
-
-	c += popcount(v[1]);
-	c += popcount(v[2]);
-	c += popcount(v[3]);
-
-	return c;
-}
-
-uint32_t parity ( uint32_t v )
-{
-	v ^= v >> 16;
-	v ^= v >> 8;
-	v ^= v >> 4;
-	v &= 0xf;
-
-	return (0x6996 >> v) & 1;
-}
-
-uint64_t parity ( uint64_t v )
-{
-	v ^= v >> 32;
-	v ^= v >> 16;
-	v ^= v >> 8;
-	v ^= v >> 4;
-	v &= 0xf;
-
-	return (0x6996 >> v) & 1;
-}
-
 //-----------------------------------------------------------------------------
 
 uint32_t getbit ( void * block, int len, uint32_t bit )
