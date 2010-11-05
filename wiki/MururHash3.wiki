@@ -1,20 +1,10 @@
-#MurmurHash3 information and brief performance results
+#summary MurmurHash3 information and brief performance results
 
 = Introduction =
 
-Add your content here.
-
+MurmurHash3? comes in 4 variants - 32/64/128-bit version for 32-bit platforms, and a 128-bit version for 64-bit platforms. The 32- and 64-bit versions for 64-bit platforms just use a subset of the 128-bit result - this was faster than trying to make specialized versions for each hash size.
 
 = Details =
-
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
-
-
-
-MurmurHash3? comes in 4 variants - 32/64/128-bit version for 32-bit platforms, and a 128-bit version for 64-bit platforms. The 32- and 64-bit versions for 64-bit platforms just use a subset of the 128-bit result - this was faster than trying to make specialized versions for each hash size.
 
 Here are some brief test results, all performed on a single core of an Intel Core 2 Quad @ 3 gigahertz -
 
@@ -26,17 +16,16 @@ Here are some brief test results, all performed on a single core of an Intel Cor
   * SuperFastHash_x64_32 - 1311 mb/sec
   * Lookup3_x86_32 - 1234 mb/sec 
   * Lookup3_x64_32 - 1265 mb/sec
-  * MurmurHash2?_x86_32 - 2577 mb/sec
-  * MurmurHash2?_x86_64 - 3352 mb/sec (2)
-  * MurmurHash2?_x64_64 - 2857 mb/sec
-  * MurmurHash3?_x86_32 - 3105 mb/sec 
-  * MurmurHash3?_x86_64 - 2901 mb/sec 
-  * MurmurHash3?_x86_128 - 2803 mb/sec
-  * MurmurHash3?_x64_128 - *5058* mb/sec (3)
+  * MurmurHash2_x86_32 - 2577 mb/sec
+  * MurmurHash2_x86_64 - 3352 mb/sec (2)
+  * MurmurHash2_x64_64 - 2857 mb/sec
+  * MurmurHash3_x86_32 - 3105 mb/sec 
+  * MurmurHash3_x86_64 - 2901 mb/sec 
+  * MurmurHash3_x86_128 - 2803 mb/sec
+  * MurmurHash3_x64_128 - *5058* mb/sec (3)
 
 (1) - SuperFastHash? has very poor collision properties, which have been documented elsewhere.
 
 (2) - MurmurHash2?_x86_64 computes two 32-bit results in parallel and mixes them at the end, which is fast but means that collision resistance is only as good as a 32-bit hash. I suggest avoiding this variant.
 
 (3) - Yes, 5 gigabytes per second. That's about 1.68 bytes per cycle, or about 9.5 cycles per 16-byte chunk. The inner loop is 20 instructions long, so we're sustaining almost 2 instructions per cycle. Hooray for modern platforms with fast 64-bit multipliers and superscalar architectures. :)
-
