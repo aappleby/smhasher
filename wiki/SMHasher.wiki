@@ -91,3 +91,5 @@ Hash functions should produce different outputs even if the keys they're hashing
 === Seed Tests ===
 
 A hash function that accepts a 'seed' or 'nonce' value is quite useful when we intentionally want a single key to generate multiple hash values in a repeatable way. Ideally, every bit of the seed should affect every bit of the hash function's output just as if it were a part of the key we were hashing.
+
+We treat this in the same way as we would a keyset test, except we use a constant key ("The quick brown fox...") and use the integers from 0 to 1 million as our seed values.
