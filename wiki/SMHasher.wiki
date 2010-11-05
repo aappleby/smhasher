@@ -57,3 +57,11 @@ If nearby bits in the key tend to cancel each other out in the hash function, th
 This is a convenient place for users to create keyset patterns that match those found in their own applications.
 
 Given a prefix string P, a suffix string S, a set of characters C, and a length value L, generate all possible keys of the form P+[L characters from C]+S and test their collision + distribution properties.
+
+== Zero Keyset Tests ==
+
+Hash functions should produce different outputs even if the keys they're hashing consist of nothing but zeroes - as long as those keys are all of different lengths.
+
+== Seed Tests ==
+
+A hash function that accepts a 'seed' or 'nonce' value is quite useful when we intentionally want a single key to generate multiple hash values in a repeatable way. Ideally, every bit of the seed should affect every bit of the hash function's output just as if it were a part of the key we were hashing.
