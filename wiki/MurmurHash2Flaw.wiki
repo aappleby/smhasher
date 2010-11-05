@@ -72,8 +72,8 @@ uint32_t test ( uint32_t x )
 
 for all possible values of x, I only get 172,013,942 unique results instead of the 2^32 expected. That means we're getting ~4.6 bits cancelled out on average. Not good.
 
-Will this flaw cause your program to fail? Probably not - what this means in real-world terms is that if your keys contain repeated 4-byte values AND they differ only in those repeated values AND the repetitions fall on a 4-byte boundary, then your keys will collide with a probability of about 1 in 2^27.4 instead of 2^32. Due to the birthday paradox, you should have a better than 50% chance of finding a collision in a group of 13115 bad keys instead of 65536.
+Will this flaw cause your program to fail? Probably not - what this means in real-world terms is that if your keys contain repeated 4-byte values AND they differ only in those repeated values AND the repetitions fall on a 4-byte boundary, then your keys will collide with a probability of about 1 in 2^27.4^ instead of 2^32^. Due to the birthday paradox, you should have a better than 50% chance of finding a collision in a group of 13115 bad keys instead of 65536.
 
 Can this be patched up by choosing a different value of 'm'? Unfortunately not. Different values produce different amounts of cancellation, but there is always cancellation - the low bit of h will always end up 0 no matter which multiplier you use.
 
-MurmurHash3 (not yet published) uses a much different mix setup that eliminates this problem and runs considerably faster than MurmurHash2, so if this flaw does prove to be a problem for your application you should be able to switch to MurmurHash3 without losing performance.
+MurmurHash3 uses a much different mix setup that eliminates this problem and runs considerably faster than MurmurHash2, so if this flaw does prove to be a problem for your application you should be able to switch to MurmurHash3 without losing performance.
