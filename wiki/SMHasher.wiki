@@ -69,6 +69,9 @@ This is more of a sanity check than a difficult keyset to hash. Given an N-bit h
 
 If nearby bits in the key tend to cancel each other out in the hash function, this should produce a lot more random collisions than expected.
 
+Because this test generates an enormous amount of data (N*2-20 keysets, each containing 1 million keys) and each keyset is relatively easy to hash (it's just a set of contiguous integers left-shifted some amount), we skip the distribution tests and just report collision results.
+
+
 === Text Keyset Tests ===
 
 This is a convenient place for users to create keyset patterns that match those found in their own applications.
