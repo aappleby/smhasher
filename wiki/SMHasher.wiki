@@ -59,7 +59,9 @@ Generate all N-bit keys with only M bits set where N >>> M. Very, very hard to h
 
 === Permutation Keyset Tests ===
 
-Ten blocks of key data can be assembled into a key in ~3.6 million ways. If each block only has a single bit set, the resulting keys are very hard to hash well - there's just not much data there to work with.
+Breaking a key into blocks and hashing the blocks in parallel is a good way to increase performance, but a hash function must ensure that changing the order of the blocks in the key also changes the resulting hash value.
+
+The permutation keyset tests this by creating ten small, sparse blocks of key data and generating all ~3.6 million possible keys that are permutations of those blocks.
 
 === Windowed Keyset Tests ===
 
@@ -71,7 +73,7 @@ If nearby bits in the key tend to cancel each other out in the hash function, th
 
 This is a convenient place for users to create keyset patterns that match those found in their own applications.
 
-Given a prefix string P, a suffix string S, a set of characters C, and a length value L, generate all possible keys of the form P+[L characters from C]+S and test their collision + distribution properties.
+Given a prefix string P, a suffix string S, a set of characters C, and a length value L, generate all possible keys of the form P+(L characters from C)+S and test their collision + distribution properties.
 
 === Zero Keyset Tests ===
 
