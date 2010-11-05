@@ -6,7 +6,7 @@ MurmurHash3 comes in 4 variants - 32/64/128-bit version for 32-bit platforms, an
 
 = Details =
 
-Here are some brief test results, all produced using the SMHasher test suite on a single core of an Intel Core 2 Quad @ 3 gigahertz -
+Here are some brief test results, all produced using the [SMHasher] test suite on a single core of an Intel Core 2 Quad @ 3 gigahertz -
 
 = Bulk speed test, hashing an 8-byte-aligned 256k block =
 
