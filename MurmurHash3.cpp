@@ -196,6 +196,8 @@ __forceinline void bmix32 ( uint32_t & h1, uint32_t & h2, uint32_t & h3, uint32_
 	h1 += h3;
 	h1 += h4;
 
+	h1 = _rotl(h1,17);
+
 	k2 *= c2; 
 	k2  = _rotl(k2,11);
 	k2 *= c1;
