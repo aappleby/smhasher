@@ -77,9 +77,7 @@ The 32-bit, 4-block inter-mix is
 h1 += h2;
 h1 += h3;
 h1 += h4;
-
 h1 = _rotl(h1,17);
-
 h2 += h1;
 h3 += h1;
 h4 += h1;
