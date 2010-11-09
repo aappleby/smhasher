@@ -42,6 +42,19 @@ bool g_testZeroes      = false;
 bool g_testSeed        = false;
 //*/
 
+
+int64_t g_hashcount = 0;
+int64_t g_bytecount = 0;
+
+void counterhash ( const void * , const int len, const uint32_t , void * out )
+{
+	g_hashcount++;
+	g_bytecount += len;
+
+	*(uint32_t*)out = rand_u32();
+}
+
+
 //-----------------------------------------------------------------------------
 
 struct HashInfo
@@ -54,6 +67,7 @@ struct HashInfo
 
 HashInfo g_hashes[] = 
 {
+	{ counterhash,          32, "count",       "Counts how many times the hash function is called" },
 	{ randhash_32,          32, "rand32",      "Random number generator, 32-bit" },
 	{ randhash_64,          64, "rand64",      "Random number generator, 64-bit" },
 	{ randhash_128,        128, "rand128",     "Random number generator, 128-bit" },
@@ -386,6 +400,14 @@ int main ( int argc, char ** argv )
 	//testHash("rand32");
 	//testHash("rand64");
 	//testHash("rand128");
+
+	//testHash("donothing");
+
+	//testHash("count");
+
+	//printf("Called the hash function %I64d times, %I64d bytes hashed\n",g_hashcount,g_bytecount);
+
+	//testHash("crc32");
 
 	//testHash("fnv");
 	//testHash("superfast");
