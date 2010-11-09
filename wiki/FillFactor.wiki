@@ -22,11 +22,3 @@ return 1 - (f / n);
 }}}
 
 where 'k' is the number of keys in the hash table, 'n' is the number of buckets in the table, and 'r' is the root-mean-square value of the number of keys in each bucket.
-
-
-= Details =
-
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
