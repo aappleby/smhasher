@@ -10,7 +10,7 @@
 
 3. Differentials. How often do almost-but-not-quite identical keys produce identical hash values? What is the smallest difference between two keys that can possibly cause the hash function to produce identical values?
 
-4. Keysets. Take a bunch of keys, hash them, and analyze the resulting hash values. How evenly are the hash values spread over the 2^N-bit space? How often do unrelated keys produce identical hash values, and does this occur more likely than would be expected due to statistics?
+4. Keysets. Take a bunch of keys, hash them, and analyze the resulting hash values. How evenly are the hash values spread over the 2^N-bit space (I've come up with an interesting metric for this which you can read about [FillFactor here]? How often do unrelated keys produce identical hash values, and does this occur more likely than would be expected due to statistics? 
 
 To address #4, we generate a variety of different hard-to-hash keysets and run our collision & distribution tests against all of them.
 
