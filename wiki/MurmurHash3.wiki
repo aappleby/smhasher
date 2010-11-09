@@ -88,6 +88,8 @@ where 'hN' is one block of the hash value.
 
 == Bulk speed test, hashing an 8-byte-aligned 256k block ==
 
+Results are from an Intel Core 2 Quad Q9650 running at 3.0 ghz, running on a single core.
+
 {{{
 FNV_x86_32           -  554 mb/sec 
 FNV_x64_32           -  715 mb/sec
