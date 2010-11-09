@@ -2,7 +2,7 @@
 
 = Introduction =
 
-MurmurHash2 is a previous version of MurmurHash, and was published in 2008. It was considerably speedier than both MurmurHash1, but was discovered to have a [MurmurHash2Flaw flaw] that, while not affecting most applications, was still worth fixing.
+MurmurHash2 is a previous version of MurmurHash, and was published in 2008. It was considerably speedier than MurmurHash1, but was discovered to have a [MurmurHash2Flaw flaw] that, while not affecting most applications, was still worth fixing.
 
 
 = Details =
