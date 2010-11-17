@@ -36,27 +36,32 @@ void AlignmentTest ( pfHash hash, const int hashbits )
 {
 	const int hashbytes = hashbits / 8;
 
-	printf("Testing alignment handling on small keys..........");
+	printf("Testing alignment handling..........");
 
-	char bufs[16][64];
+	char testblob[512];
+	rand_p(testblob,512);
 
+	char * bufs[16];
 	char * strings[16];
 
 	for(int i = 0; i < 16; i++)
 	{
-		uint32_t b = uint32_t(&bufs[i][0]);
+		bufs[i] = new char[1024];
+		uint32_t b = uint32_t(bufs[i]);
 
 		b = (b+15)&(~15);
 
 		strings[i] = (char*)(b + i);
-
-		strcpy_s(strings[i],32,"DeadBeefDeadBeef");
+		
+		memcpy(strings[i],testblob,512);
 	}
+
+	bool result = true;
 
 	uint32_t hash1[64];
 	uint32_t hash2[64];
 
-	for(int k = 1; k <= 16; k++)
+	for(int k = 1; k <= 512; k++)
 	for(int j = 0; j < 15; j++)
 	for(int i = j+1; i < 16; i++)
 	{
@@ -68,12 +73,20 @@ void AlignmentTest ( pfHash hash, const int hashbits )
 
 		if(memcmp(hash1,hash2,hashbytes) != 0)
 		{
-			printf("*********FAIL*********\n");
-			return;
+			result = false;
 		}
 	}
 
-	printf("PASS\n");
+	if(!result)
+	{
+		printf("*********FAIL*********\n");
+	}
+	else
+	{
+		printf("PASS\n");
+	}
+
+	for(int i = 0; i < 16; i++) delete [] bufs[i];
 }
 
 //----------------------------------------------------------------------------
