@@ -10,6 +10,8 @@
 #include "Types.h"
 #include "Stats.h"
 
+#include <algorithm>  // for std::swap
+
 //-----------------------------------------------------------------------------
 // Sanity tests
 
@@ -38,11 +40,11 @@ void PermutationKeygenRecurse ( pfHash hash, uint32_t * blocks, int blockcount, 
 
 	for(int i = k; i < blockcount; i++)
 	{
-		swap(blocks[k],blocks[i]);
+		std::swap(blocks[k],blocks[i]);
 
 		PermutationKeygenRecurse(hash,blocks,blockcount,k+1,hashes);
 
-		swap(blocks[k],blocks[i]);
+		std::swap(blocks[k],blocks[i]);
 	}
 }
 

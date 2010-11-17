@@ -17,14 +17,6 @@ uint32_t whitehole ( void );
 
 typedef void (*pfHash) ( const void * blob, const int len, const uint32_t seed, void * out );
 
-template < typename T >
-void swap ( T & a, T & b )
-{
-	T t = a;
-	a = b;
-	b = t;
-}
-
 //-----------------------------------------------------------------------------
 
 template < class T >
