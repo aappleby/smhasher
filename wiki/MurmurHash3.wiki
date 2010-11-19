@@ -114,4 +114,4 @@ MurmurHash3_x64_128  - 5058 mb/sec (3)
 
 (2) - MurmurHash2_x86_64 computes two 32-bit results in parallel and mixes them at the end, which is fast but means that collision resistance is only as good as a 32-bit hash. I suggest avoiding this variant.
 
-(3) - That's about 1.68 bytes per cycle, or about 9.5 cycles per 16-byte chunk. The inner loop is 20 instructions long, so we're sustaining almost 2 instructions per cycle. Hooray for modern platforms with fast 64-bit multipliers and superscalar architectures. :)
+(3) - That's about 1.68 bytes per cycle, or about 9.5 cycles per 16-byte chunk. The inner loop is 20 instructions long, so we're sustaining over 2 instructions per cycle. Hooray for modern platforms with fast 64-bit multipliers and superscalar architectures. :)
