@@ -1,0 +1,44 @@
+#summary Discussion of the "fill factor" metric used in evaluating hash value distributions.
+
+= Introduction =
+
+What makes a hash function "good enough"?....
+
+Balls and bins
+
+Bias
+
+The balls-and-bins problem is quite thoroughly understood, and there are plenty of statistical tests we can apply to a distribution to determine various properties about it.
+
+chi-square
+
+p-value
+
+RMS
+
+A lot of those metrics are overkill, though. 
+
+Just because a distribution is _distinguishable_ from random doesn't mean that it's not usable.
+
+The best possible hash function would take our N keys and distribute them evenly between all M cells.
+
+The worst possible hash function would take those N keys and assign them all to a single cell, leaving the other cells empty.
+
+If we're testing a "perfect" hash function (exactly N/M balls in each of M bins), the probability of that distribution happening randomly is astronomically unlikely, even though for our purposes it is optimal.
+
+
+
+= Fill Factor =
+
+What we really want though is a statistic that measures how efficiently the bins of the hash table are being used - if all keys end up in the same bin, that'
+
+// Distribution "score"
+// TODO - big writeup of what this score means
+
+// Basically, we're computing a constant that says "The test distribution is as
+// uniform, RMS-wise, as a random distribution restricted to (1-X)*100 percent of
+// the bins. This makes for a nice uniform way to rate a distribution that isn't
+// dependent on the number of bins or the number of keys
+
+// (as long as # keys > # bins * 3 or so, otherwise random fluctuations show up
+// as distribution weaknesses)
