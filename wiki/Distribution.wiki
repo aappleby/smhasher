@@ -2,6 +2,8 @@
 
 = Introduction =
 
+(This page is a very very very rough draft)
+
 What makes a hash function "good enough"?....
 
 Balls and bins
