@@ -8,6 +8,7 @@
 
 void     printbits   ( void * blob, int len );
 void     printhex32  ( void * blob, int len );
+void     printbytes  ( void * blob, int len );
 
 uint32_t getbit      ( void * blob, int len, uint32_t bit );
 uint32_t getbit_wrap ( void * blob, int len, uint32_t bit );

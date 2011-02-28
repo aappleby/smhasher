@@ -20,6 +20,62 @@ void QuickBrownFox      ( pfHash hash, const int hashbits );
 void AlignmentTest      ( pfHash hash, const int hashbits );
 void AppendedZeroesTest ( pfHash hash, const int hashbits );
 
+//-----------------------------------------------------------------------------
+// Keyset 'Combination' - all possible combinations of input blocks
+
+template< typename hashtype >
+void CombinationKeygenRecurse ( uint32_t * key, int len, int maxlen, 
+							    uint32_t * blocks, int blockcount, 
+								pfHash hash, std::vector<hashtype> & hashes )
+{
+	if(len == maxlen) return;
+
+	for(int i = 0; i < blockcount; i++)
+	{
+		key[len] = blocks[i];
+	
+		//if(len == maxlen-1)
+		{
+			hashtype h;
+			hash(key,(len+1) * sizeof(uint32_t),0,&h);
+			hashes.push_back(h);
+		}
+
+		//else
+		{
+			CombinationKeygenRecurse(key,len+1,maxlen,blocks,blockcount,hash,hashes);
+		}
+	}
+}
+
+template< typename hashtype >
+bool CombinationKeyTest ( hashfunc<hashtype> hash, int maxlen, uint32_t * blocks, int blockcount, bool testColl, bool testDist, bool drawDiagram )
+{
+	printf("Keyset 'Combination' - up to %d blocks from a set of %d - ",maxlen,blockcount);
+
+	//----------
+
+	std::vector<hashtype> hashes;
+
+	uint32_t * key = new uint32_t[maxlen];
+
+	CombinationKeygenRecurse<hashtype>(key,0,maxlen,blocks,blockcount,hash,hashes);
+
+	delete [] key;
+
+	printf("%d keys\n",(int)hashes.size());
+
+	//----------
+
+	bool result = true;
+
+	result &= TestHashList<hashtype>(hashes,testColl,testDist,drawDiagram);
+	
+	printf("\n");
+
+	return result;
+}
+
 //----------------------------------------------------------------------------
 // Keyset 'Permutation' - given a set of 32-bit blocks, generate keys
 // consisting of all possible permutations of those blocks

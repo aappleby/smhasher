@@ -29,55 +29,81 @@ void QuickBrownFox ( pfHash hash, const int hashbits )
 }
 
 //----------------------------------------------------------------------------
-// Alignment of the keys should not affect the hash value - if it does,
-// something is broken.
+// Basic sanity checks -
 
-void AlignmentTest ( pfHash hash, const int hashbits )
-{
-	const int hashbytes = hashbits / 8;
+// A hash function should not be reading outside the bounds of the key.
 
-	printf("Testing alignment handling..........");
+// Flipping a bit of a key should, with overwhelmingly high probability,
+// result in a different hash.
 
-	char testblob[512];
-	rand_p(testblob,512);
+// Hashing the same key twice should always produce the same result.
 
-	char * bufs[16];
-	char * strings[16];
+// The memory alignment of the key should not affect the hash result.
 
-	for(int i = 0; i < 16; i++)
-	{
-		bufs[i] = new char[1024];
-		uint32_t b = uint32_t(bufs[i]);
-
-		b = (b+15)&(~15);
-
-		strings[i] = (char*)(b + i);
-		
-		memcpy(strings[i],testblob,512);
-	}
+bool SanityTest ( pfHash hash, const int hashbits )
+{	printf("Testing bit twiddling");
 
 	bool result = true;
 
-	uint32_t hash1[64];
-	uint32_t hash2[64];
+	const int hashbytes = hashbits/8;
+	const int reps = 10;
+	const int keymax = 128;
+	const int pad = 16;
+	const int buflen = keymax + pad*3;
+	
+	uint8_t * buffer1 = new uint8_t[buflen];
+	uint8_t * buffer2 = new uint8_t[buflen];
 
-	for(int k = 1; k <= 512; k++)
-	for(int j = 0; j < 15; j++)
-	for(int i = j+1; i < 16; i++)
+	uint8_t * hash1 = new uint8_t[hashbytes];
+	uint8_t * hash2 = new uint8_t[hashbytes];
+
+	//----------
+	
+	for(int irep = 0; irep < reps; irep++)
 	{
-		const char * s1 = strings[i];
-		const char * s2 = strings[j];
+		if(irep % (reps/10) == 0) printf(".");
 
-		hash(s1,k,0,hash1);
-		hash(s2,k,0,hash2);
-
-		if(memcmp(hash1,hash2,hashbytes) != 0)
+		for(int len = 4; len <= keymax; len++)
 		{
-			result = false;
+			for(int offset = pad; offset < pad*2; offset++)
+			{
+				uint8_t * key1 = &buffer1[pad];
+				uint8_t * key2 = &buffer2[pad+offset];
+
+				rand_p(buffer1,buflen);
+				rand_p(buffer2,buflen);
+
+				memcpy(key2,key1,len);
+
+				hash(key1,len,0,hash1);
+
+				for(int bit = 0; bit < (len * 8); bit++)
+				{
+					// Flip a bit, hash the key -> we should get a different result.
+
+					flipbit(key2,len,bit);
+					hash(key2,len,0,hash2);
+
+					if(memcmp(hash1,hash2,hashbytes) == 0)
+					{
+						result = false;
+					}
+
+					// Flip it back, hash again -> we should get the original result.
+
+					flipbit(key2,len,bit);
+					hash(key2,len,0,hash2);
+
+					if(memcmp(hash1,hash2,hashbytes) != 0)
+					{
+						result = false;
+					}
+				}
+			}
 		}
 	}
 
-	if(!result)
+	if(result == false)
 	{
 		printf("*********FAIL*********\n");
 	}
@@ -86,7 +112,10 @@ void AlignmentTest ( pfHash hash, const int hashbits )
 		printf("PASS\n");
 	}
 
-	for(int i = 0; i < 16; i++) delete [] bufs[i];
+	delete [] hash1;
+	delete [] hash2;
+
+	return result;
 }
 
 //----------------------------------------------------------------------------
@@ -130,87 +159,6 @@ void AppendedZeroesTest ( pfHash hash, const int hashbits )
 	}
 
 	printf("PASS\n");
-}
-
-//----------------------------------------------------------------------------
-// Basic sanity checks -
-
-// A hash function should not be reading outside the bounds of the key.
-
-// Flipping a bit of a key should, with overwhelmingly high probability,
-// result in a different hash.
-
-// Hashing the same key twice should always produce the same result.
-
-bool SanityTest ( pfHash hash, const int hashbits )
-{
-	bool result = true;
-
-	const int hashbytes = hashbits/8;
-	const int reps = 100;
-
-	printf("Testing bit twiddling");
-
-	uint8_t buffer[256];
-	uint8_t * key = &buffer[64];
-
-	uint8_t * h1 = new uint8_t[hashbytes];
-	uint8_t * h2 = new uint8_t[hashbytes];
-
-	for(int irep = 0; irep < reps; irep++)
-	{
-		if(irep % (reps/10) == 0) printf(".");
-
-		for(int len = 1; len <= 128; len++)
-		{
-			// Generate a random key in the middle of the buffer, hash it,
-			// and then fill the space around the key with garbage. If a
-			// broken hash function reads past the ends of the key, it should
-			// fail the "did we get the same hash?" test below.
-
-			rand_p(key,len);
-			hash(key,len,0,h1);
-
-			rand_p(buffer,64);
-			rand_p(key+len,64);
-
-			// Flip a bit, hash the key -> we should get a different result.
-			// Flip it back, hash again -> we should get the same result.
-
-			for(int bit = 0; bit < (len * 8); bit++)
-			{
-				flipbit(key,len,bit);
-				hash(key,len,0,h2);
-
-				if(memcmp(h1,h2,hashbytes) == 0)
-				{
-					result = false;
-				}
-
-				flipbit(key,len,bit);
-				hash(key,len,0,h2);
-
-				if(memcmp(h1,h2,hashbytes) != 0)
-				{
-					result = false;
-				}
-			}
-		}
-	}
-
-	if(result == false)
-	{
-		printf("*********FAIL*********\n");
-	}
-	else
-	{
-		printf("PASS\n");
-	}
-
-	delete [] h1;
-	delete [] h2;
-
-	return result;
 }
 
 //-----------------------------------------------------------------------------
