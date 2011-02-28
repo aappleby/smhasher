@@ -569,7 +569,7 @@ int main ( int argc, char ** argv )
 	//testHash("murmur2B");
 	//testHash("murmur2C");
 
-	//testHash("murmur3a");
+	testHash("murmur3a");
 	//testHash("murmur3b");
 	//testHash("murmur3c");
 
