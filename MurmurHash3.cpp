@@ -34,15 +34,11 @@ inline void bmix32 ( uint32_t & h1, uint32_t & k1, uint32_t & c1, uint32_t & c2 
 
 //----------
 
-//void MurmurHash3_x86_32 ( const void * key, int len, const void * seed, void * out )
 void MurmurHash3_x86_32 ( const void * key, int len, uint32_t seed, void * out )
 {
 	const uint8_t * data = (const uint8_t*)key;
 	const int nblocks = len / 4;
 
-	//uint32_t * s = (uint32_t*)seed;
-
-	//uint32_t h1 = 0x971e137b ^ s[0];
 	uint32_t h1 = 0x971e137b ^ seed;
 
 	uint32_t c1 = 0x95543787;
@@ -85,7 +81,6 @@ void MurmurHash3_x86_32 ( const void * key, int len, uint32_t seed, void * out )
 	h1 *= 0xc2b2ae35;
 	h1 ^= h1 >> 16;
 
-	//h1 ^= s[0];
 	h1 ^= seed;
 
 	*(uint32_t*)out = h1;
@@ -156,18 +151,10 @@ inline uint32_t fmix32 ( uint32_t h )
 	return h;
 }
 
-//void MurmurHash3_x86_128 ( const void * key, const int len, const void * seed, void * out )
 void MurmurHash3_x86_128 ( const void * key, const int len, uint32_t seed, void * out )
 {
 	const uint8_t * data = (const uint8_t*)key;
 	const int nblocks = len / 16;
-
-	//uint32_t * s = (uint32_t*)(seed);
-
-	//uint32_t h1 = 0x8de1c3ac ^ s[0];
-	//uint32_t h2 = 0xbab98226 ^ s[1];
-	//uint32_t h3 = 0xfcba5b2d ^ s[2];
-	//uint32_t h4 = 0x32452e3e ^ s[3];
 
 	uint32_t h1 = 0x8de1c3ac ^ seed;
 	uint32_t h2 = 0xbab98226 ^ seed;
