@@ -81,6 +81,7 @@ HashInfo g_hashes[] =
 	{ FNV,                  32, "FNV",         "Fowler-Noll-Vo hash, 32-bit" },
 	{ lookup3_test,         32, "lookup3",     "Bob Jenkins' lookup3" },
 	{ SuperFastHash,        32, "superfast",   "Paul Hsieh's SuperFastHash" },
+	{ MurmurOAAT,           32, "MurmurOAAT",  "Murmur one-at-a-time" },
 	
 	// MurmurHash2
 
@@ -92,11 +93,7 @@ HashInfo g_hashes[] =
 	// MurmurHash3
 
 	{ MurmurHash3_x86_32,   32, "Murmur3A",    "MurmurHash3 for x86, 32-bit" },
-	{ MurmurHash3_x86_64,   64, "Murmur3B",    "MurmurHash3 for x86, 64-bit" },
 	{ MurmurHash3_x86_128, 128, "Murmur3C",    "MurmurHash3 for x86, 128-bit" },
-
-	{ MurmurHash3_x64_32,   32, "Murmur3D",    "MurmurHash3 for x64, 32-bit" },
-	{ MurmurHash3_x64_64,   64, "Murmur3E",    "MurmurHash3 for x64, 64-bit" },
 	{ MurmurHash3_x64_128, 128, "Murmur3F",    "MurmurHash3 for x64, 128-bit" },
 
 };
@@ -130,7 +127,6 @@ void test ( hashfunc<hashtype> hash, const char * hashname )
 
 		QuickBrownFox(hash,hashbits);
 		SanityTest(hash,hashbits);
-		AlignmentTest(hash,hashbits);
 		AppendedZeroesTest(hash,hashbits);
 		printf("\n");
 	}
@@ -145,12 +141,21 @@ void test ( hashfunc<hashtype> hash, const char * hashname )
 		BulkSpeedTest(hash);
 		printf("\n");
 
-		TinySpeedTest<hashtype,4>(hash);
-		TinySpeedTest<hashtype,8>(hash);
-		TinySpeedTest<hashtype,16>(hash);
-		TinySpeedTest<hashtype,32>(hash);
-		TinySpeedTest<hashtype,64>(hash);
-		TinySpeedTest<hashtype,128>(hash);
+		for(int i = 1; i < 32; i++)
+		{
+			double cycles;
+
+			TinySpeedTest(hash,sizeof(hashtype),i,true,cycles);
+		}
+
+		for(int i = 32; i <= 2048; i += 32)
+		{
+			double cycles;
+
+
+			TinySpeedTest(hash,sizeof(hashtype),i,true,cycles);
+		}
+
 		printf("\n");
 	}
 
@@ -181,10 +186,44 @@ void test ( hashfunc<hashtype> hash, const char * hashname )
 	{
 		printf("[[[ Avalanche Tests ]]]\n\n");
 
-		const int hashbits = sizeof(hashtype) * 8;
+		//const int hashbits = sizeof(hashtype) * 8;
 		bool result = true;
 
-		result &= AvalancheTest< Blob<hashbits * 2>, hashtype > (hash,2000000);
+		result &= AvalancheTest< Blob< 32>, hashtype > (hash,300000);
+		result &= AvalancheTest< Blob< 40>, hashtype > (hash,300000);
+		result &= AvalancheTest< Blob< 48>, hashtype > (hash,300000);
+		result &= AvalancheTest< Blob< 56>, hashtype > (hash,300000);
+
+		result &= AvalancheTest< Blob< 64>, hashtype > (hash,300000);
+		result &= AvalancheTest< Blob< 72>, hashtype > (hash,300000);
+		result &= AvalancheTest< Blob< 80>, hashtype > (hash,300000);
+		result &= AvalancheTest< Blob< 88>, hashtype > (hash,300000);
+		result &= AvalancheTest< Blob< 96>, hashtype > (hash,300000);
+		result &= AvalancheTest< Blob<104>, hashtype > (hash,300000);
+		result &= AvalancheTest< Blob<112>, hashtype > (hash,300000);
+		result &= AvalancheTest< Blob<120>, hashtype > (hash,300000);
+
+		result &= AvalancheTest< Blob<128>, hashtype > (hash,300000);
+		result &= AvalancheTest< Blob<136>, hashtype > (hash,300000);
+		result &= AvalancheTest< Blob<144>, hashtype > (hash,300000);
+		result &= AvalancheTest< Blob<152>, hashtype > (hash,300000);
+		result &= AvalancheTest< Blob<160>, hashtype > (hash,300000);
+		result &= AvalancheTest< Blob<168>, hashtype > (hash,300000);
+		result &= AvalancheTest< Blob<176>, hashtype > (hash,300000);
+		result &= AvalancheTest< Blob<184>, hashtype > (hash,300000);
+		result &= AvalancheTest< Blob<192>, hashtype > (hash,300000);
+		result &= AvalancheTest< Blob<200>, hashtype > (hash,300000);
+		result &= AvalancheTest< Blob<208>, hashtype > (hash,300000);
+		result &= AvalancheTest< Blob<216>, hashtype > (hash,300000);
+		result &= AvalancheTest< Blob<224>, hashtype > (hash,300000);
+		result &= AvalancheTest< Blob<232>, hashtype > (hash,300000);
+		result &= AvalancheTest< Blob<240>, hashtype > (hash,300000);
+		result &= AvalancheTest< Blob<248>, hashtype > (hash,300000);
+
+		result &= AvalancheTest< Blob<256>, hashtype > (hash,300000);
+
+		//result &= AvalancheTest< Blob<hashbits * 2>, hashtype > (hash,200000);
+		//result &= AvalancheTest< Blob<768>, hashtype > (hash,2000000);
 
 		// The bit independence test is slow and not particularly useful...
 		//result &= BicTest < Blob<hashbits * 2>, hashtype > ( hash, 1000000 );
@@ -241,34 +280,139 @@ void test ( hashfunc<hashtype> hash, const char * hashname )
 
 	if(g_testPermutation || g_testAll)
 	{
-		printf("[[[ Keyset 'Permutation' Tests ]]]\n\n");
-
-		bool result = true;
-		bool drawDiagram = false;
-
-		// This very sparse set of blocks is particularly hard for SuperFastHash
-
-		uint32_t blocks[] =
 		{
-			0x00000000,
-			0x00000001,
-			0x00000002,
-			
-			0x00000400,
-			0x00008000,
-			
-			0x00080000,
-			0x00200000,
+			// This one breaks lookup3, surprisingly
 
-			0x20000000,
-			0x40000000,
-			0x80000000,
-		};
+			printf("[[[ Keyset 'Combination Lowbits' Tests ]]]\n\n");
 
-		result &= PermutationKeyTest<hashtype>(hash,blocks,sizeof(blocks) / sizeof(uint32_t),true,true,drawDiagram);
+			bool result = true;
+			bool drawDiagram = false;
 
-		if(!result) printf("*********FAIL*********\n");
-		printf("\n");
+			uint32_t blocks[] =
+			{
+				0x00000000, 
+				
+				0x00000001, 0x00000002, 0x00000003, 0x00000004, 0x00000005, 0x00000006, 0x00000007,
+			};
+
+			result &= CombinationKeyTest<hashtype>(hash,8,blocks,sizeof(blocks) / sizeof(uint32_t),true,true,drawDiagram);
+
+			if(!result) printf("*********FAIL*********\n");
+			printf("\n");
+		}
+
+		{
+			printf("[[[ Keyset 'Combination Highbits' Tests ]]]\n\n");
+
+			bool result = true;
+			bool drawDiagram = false;
+
+			uint32_t blocks[] =
+			{
+				0x00000000, 
+				
+				0x20000000, 0x40000000, 0x60000000, 0x80000000, 0xA0000000, 0xC0000000, 0xE0000000
+			};
+
+			result &= CombinationKeyTest<hashtype>(hash,8,blocks,sizeof(blocks) / sizeof(uint32_t),true,true,drawDiagram);
+
+			if(!result) printf("*********FAIL*********\n");
+			printf("\n");
+		}
+
+		{
+			printf("[[[ Keyset 'Combination 0x8000000' Tests ]]]\n\n");
+
+			bool result = true;
+			bool drawDiagram = false;
+
+			uint32_t blocks[] =
+			{
+				0x00000000, 
+				
+				0x80000000,
+			};
+
+			result &= CombinationKeyTest<hashtype>(hash,20,blocks,sizeof(blocks) / sizeof(uint32_t),true,true,drawDiagram);
+
+			if(!result) printf("*********FAIL*********\n");
+			printf("\n");
+		}
+
+		{
+			printf("[[[ Keyset 'Combination 0x0000001' Tests ]]]\n\n");
+
+			bool result = true;
+			bool drawDiagram = false;
+
+			uint32_t blocks[] =
+			{
+				0x00000000, 
+				
+				0x00000001,
+			};
+
+			result &= CombinationKeyTest<hashtype>(hash,20,blocks,sizeof(blocks) / sizeof(uint32_t),true,true,drawDiagram);
+
+			if(!result) printf("*********FAIL*********\n");
+			printf("\n");
+		}
+
+		{
+			printf("[[[ Keyset 'Combination Hi-Lo' Tests ]]]\n\n");
+
+			bool result = true;
+			bool drawDiagram = false;
+
+			uint32_t blocks[] =
+			{
+				0x00000000, 
+				
+				0x00000001, 0x00000002, 0x00000003, 0x00000004, 0x00000005, 0x00000006, 0x00000007,
+
+				0x80000000, 0x40000000, 0xC0000000, 0x20000000, 0xA0000000, 0x60000000, 0xE0000000
+			};
+
+			result &= CombinationKeyTest<hashtype>(hash,6,blocks,sizeof(blocks) / sizeof(uint32_t),true,true,drawDiagram);
+
+			if(!result) printf("*********FAIL*********\n");
+			printf("\n");
+		}
+
+		//----------
+
+		/*
+		{
+			printf("[[[ Keyset 'Permutation' Tests ]]]\n\n");
+
+			bool result = true;
+			bool drawDiagram = false;
+
+			// This very sparse set of blocks is particularly hard for SuperFastHash
+
+			uint32_t blocks[] =
+			{
+				0x00000000,
+				0x00000001,
+				0x00000002,
+				
+				0x00000400,
+				0x00008000,
+				
+				0x00080000,
+				0x00200000,
+
+				0x20000000,
+				0x40000000,
+				0x80000000,
+			};
+
+			result &= PermutationKeyTest<hashtype>(hash,blocks,sizeof(blocks) / sizeof(uint32_t),true,true,drawDiagram);
+
+			if(!result) printf("*********FAIL*********\n");
+			printf("\n");
+		}
+		*/
 	}
 
 	//-----------------------------------------------------------------------------
@@ -370,6 +514,10 @@ void testHash ( const char * name )
 		{
 			test<uint128_t>( pInfo->hash, pInfo->desc );
 		}
+		else if(pInfo->hashbits == 256)
+		{
+			test<uint256_t>( pInfo->hash, pInfo->desc );
+		}
 		else
 		{
 			printf("Invalid hash bit width %d for hash '%s'",pInfo->hashbits,pInfo->name);
@@ -393,9 +541,11 @@ int main ( int argc, char ** argv )
 	//g_testSanity = true;
 	//g_testSpeed = true;
 	//g_testAvalanche = true;
+	//g_testCyclic = true;
 	//g_testDiff = true;
 	//g_testSparse = true;
 	//g_testPermutation = true;
+	//g_testZeroes = true;
 
 	//testHash("rand32");
 	//testHash("rand64");
@@ -408,22 +558,24 @@ int main ( int argc, char ** argv )
 	//printf("Called the hash function %I64d times, %I64d bytes hashed\n",g_hashcount,g_bytecount);
 
 	//testHash("crc32");
+	//testHash("rand128");
 
 	//testHash("fnv");
 	//testHash("superfast");
 	//testHash("lookup3");
+	//testHash("MurmurOAAT");
 
 	//testHash("murmur2");
 	//testHash("murmur2B");
 	//testHash("murmur2C");
 
-	testHash("murmur3a");
-	testHash("murmur3b");
-	testHash("murmur3c");
+	//testHash("murmur3a");
+	//testHash("murmur3b");
+	//testHash("murmur3c");
 
-	testHash("murmur3d");
-	testHash("murmur3e");
-	testHash("murmur3f");
+	//testHash("murmur3d");
+	//testHash("murmur3e");
+	//testHash("murmur3f");
 
 	//----------
 

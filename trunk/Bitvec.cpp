@@ -71,6 +71,20 @@ void printhex32 ( void * blob, int len )
 	printf("}");
 }
 
+void printbytes ( void * blob, int len )
+{
+	uint8_t * d = (uint8_t*)blob;
+
+	printf("{ ");
+
+	for(int i = 0; i < len; i++)
+	{
+		printf("0x%02x, ",d[i]);
+	}
+
+	printf(" };");
+}
+
 //-----------------------------------------------------------------------------
 
 uint32_t getbit ( void * block, int len, uint32_t bit )

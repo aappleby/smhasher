@@ -1,6 +1,11 @@
 #include "MurmurHash3.h"
-
 #include <stdlib.h>    // for _rotl
+
+// Note - The x86 and x64 versions do _not_ produce the same results, as the
+// algorithms are optimized for their respective platforms. You can still
+// compile and run any of them on any platform, but your performance with the
+// non-native version will be less than optimal.
+
 
 //-----------------------------------------------------------------------------
 // Block read - if your platform needs to do endian-swapping or can only
@@ -12,43 +17,32 @@ inline uint32_t getblock ( const uint32_t * p, int i )
 }
 
 //----------
-// Finalization mix - force all bits of a hash block to avalanche
-
-// avalanches all bits to within 0.25% bias
-
-inline uint32_t fmix32 ( uint32_t h )
-{
-	h ^= h >> 16;
-	h *= 0x85ebca6b;
-	h ^= h >> 13;
-	h *= 0xc2b2ae35;
-	h ^= h >> 16;
-
-	return h;
-}
-
-//-----------------------------------------------------------------------------
 
 inline void bmix32 ( uint32_t & h1, uint32_t & k1, uint32_t & c1, uint32_t & c2 )
 {
-	k1 *= c1; 
-	k1  = _rotl(k1,11); 
-	k1 *= c2;
-	h1 ^= k1;
-	
-	h1 = h1*3+0x52dce729;
-
 	c1 = c1*5+0x7b7d159c;
 	c2 = c2*5+0x6bce6396;
+
+	k1 *= c1; 
+	k1 = _rotl(k1,11); 
+	k1 *= c2;
+
+	h1 = _rotl(h1,13);
+	h1 = h1*5+0x52dce729;
+	h1 ^= k1;
 }
 
 //----------
 
+//void MurmurHash3_x86_32 ( const void * key, int len, const void * seed, void * out )
 void MurmurHash3_x86_32 ( const void * key, int len, uint32_t seed, void * out )
 {
 	const uint8_t * data = (const uint8_t*)key;
 	const int nblocks = len / 4;
 
+	//uint32_t * s = (uint32_t*)seed;
+
+	//uint32_t h1 = 0x971e137b ^ s[0];
 	uint32_t h1 = 0x971e137b ^ seed;
 
 	uint32_t c1 = 0x95543787;
@@ -86,99 +80,16 @@ void MurmurHash3_x86_32 ( const void * key, int len, uint32_t seed, void * out )
 
 	h1 ^= len;
 
-	h1 = fmix32(h1);
+	h1 *= 0x85ebca6b;
+	h1 ^= h1 >> 13;
+	h1 *= 0xc2b2ae35;
+	h1 ^= h1 >> 16;
+
+	//h1 ^= s[0];
+	h1 ^= seed;
 
 	*(uint32_t*)out = h1;
 } 
-
-//-----------------------------------------------------------------------------
-
-inline void bmix32 ( uint32_t & h1, uint32_t & h2, uint32_t & k1, uint32_t & k2, uint32_t & c1, uint32_t & c2 )
-{
-	k1 *= c1; 
-	k1  = _rotl(k1,11); 
-	k1 *= c2;
-	h1 ^= k1;
-	h1 += h2;
-
-	h2 = _rotl(h2,17);
-
-	k2 *= c2; 
-	k2  = _rotl(k2,11);
-	k2 *= c1;
-	h2 ^= k2;
-	h2 += h1;
-
-	h1 = h1*3+0x52dce729;
-	h2 = h2*3+0x38495ab5;
-
-	c1 = c1*5+0x7b7d159c;
-	c2 = c2*5+0x6bce6396;
-}
-
-//----------
-
-void MurmurHash3_x86_64 ( const void * key, const int len, const uint32_t seed, void * out )
-{
-	const uint8_t * data = (const uint8_t*)key;
-	const int nblocks = len / 8;
-
-	uint32_t h1 = 0x8de1c3ac ^ seed;
-	uint32_t h2 = 0xbab98226 ^ seed;
-
-	uint32_t c1 = 0x95543787;
-	uint32_t c2 = 0x2ad7eb25;
-
-	//----------
-	// body
-
-	const uint32_t * blocks = (const uint32_t *)(data + nblocks*8);
-
-	for(int i = -nblocks; i; i++)
-	{
-		uint32_t k1 = getblock(blocks,i*2+0);
-		uint32_t k2 = getblock(blocks,i*2+1);
-
-		bmix32(h1,h2,k1,k2,c1,c2);
-	}
-
-	//----------
-	// tail
-	
-	const uint8_t * tail = (const uint8_t*)(data + nblocks*8);
-
-	uint32_t k1 = 0;
-	uint32_t k2 = 0;
-
-	switch(len & 7)
-	{
-	case 7: k2 ^= tail[6] << 16;
-	case 6: k2 ^= tail[5] << 8;
-	case 5: k2 ^= tail[4] << 0;
-	case 4: k1 ^= tail[3] << 24;
-	case 3: k1 ^= tail[2] << 16;
-	case 2: k1 ^= tail[1] << 8;
-	case 1: k1 ^= tail[0] << 0;
-	        bmix32(h1,h2,k1,k2,c1,c2);
-	};
-
-	//----------
-	// finalization
-
-	h2 ^= len;
-
-	h1 += h2;
-	h2 += h1;
-
-	h1 = fmix32(h1);
-	h2 = fmix32(h2);
-
-	h1 += h2;
-	h2 += h1;
-
-	((uint32_t*)out)[0] = h1;
-	((uint32_t*)out)[1] = h2;
-}
 
 //-----------------------------------------------------------------------------
 // This mix is large enough that VC++ refuses to inline it unless we use
@@ -230,11 +141,33 @@ __forceinline void bmix32 ( uint32_t & h1, uint32_t & h2, uint32_t & h3, uint32_
 }
 
 //----------
+// Finalization mix - force all bits of a hash block to avalanche
 
-void MurmurHash3_x86_128 ( const void * key, const int len, const uint32_t seed, void * out )
+// avalanches all bits to within 0.25% bias
+
+inline uint32_t fmix32 ( uint32_t h )
+{
+	h ^= h >> 16;
+	h *= 0x85ebca6b;
+	h ^= h >> 13;
+	h *= 0xc2b2ae35;
+	h ^= h >> 16;
+
+	return h;
+}
+
+//void MurmurHash3_x86_128 ( const void * key, const int len, const void * seed, void * out )
+void MurmurHash3_x86_128 ( const void * key, const int len, uint32_t seed, void * out )
 {
 	const uint8_t * data = (const uint8_t*)key;
 	const int nblocks = len / 16;
+
+	//uint32_t * s = (uint32_t*)(seed);
+
+	//uint32_t h1 = 0x8de1c3ac ^ s[0];
+	//uint32_t h2 = 0xbab98226 ^ s[1];
+	//uint32_t h3 = 0xfcba5b2d ^ s[2];
+	//uint32_t h4 = 0x32452e3e ^ s[3];
 
 	uint32_t h1 = 0x8de1c3ac ^ seed;
 	uint32_t h2 = 0xbab98226 ^ seed;
@@ -274,14 +207,17 @@ void MurmurHash3_x86_128 ( const void * key, const int len, const uint32_t seed,
 	case 15: k4 ^= tail[14] << 16;
 	case 14: k4 ^= tail[13] << 8;
 	case 13: k4 ^= tail[12] << 0;
+
 	case 12: k3 ^= tail[11] << 24;
 	case 11: k3 ^= tail[10] << 16;
 	case 10: k3 ^= tail[ 9] << 8;
 	case  9: k3 ^= tail[ 8] << 0;
+
 	case  8: k2 ^= tail[ 7] << 24;
 	case  7: k2 ^= tail[ 6] << 16;
 	case  6: k2 ^= tail[ 5] << 8;
 	case  5: k2 ^= tail[ 4] << 0;
+
 	case  4: k1 ^= tail[ 3] << 24;
 	case  3: k1 ^= tail[ 2] << 16;
 	case  2: k1 ^= tail[ 1] << 8;
@@ -328,16 +264,18 @@ inline void bmix64 ( uint64_t & h1, uint64_t & h2, uint64_t & k1, uint64_t & k2,
 	k1 *= c1; 
 	k1  = _rotl64(k1,23); 
 	k1 *= c2;
-	h1 ^= k1;
-	h1 += h2;
-
-	h2 = _rotl64(h2,41);
 
 	k2 *= c2; 
 	k2  = _rotl64(k2,23);
 	k2 *= c1;
-	h2 ^= k2;
+
+	h1 = _rotl64(h1,17);
+	h1 += h2;
+	h1 ^= k1;
+
+	h2 = _rotl64(h2,41);
 	h2 += h1;
+	h2 ^= k2;
 
 	h1 = h1*3+0x52dce729;
 	h2 = h2*3+0x38495ab5;
@@ -432,29 +370,5 @@ void MurmurHash3_x64_128 ( const void * key, const int len, const uint32_t seed,
 	((uint64_t*)out)[0] = h1;
 	((uint64_t*)out)[1] = h2;
 }
-
-//-----------------------------------------------------------------------------
-// If we need a smaller hash value, it's faster to just use a portion of the 
-// 128-bit hash
-
-void MurmurHash3_x64_32 ( const void * key, int len, uint32_t seed, void * out )
-{
-	uint32_t temp[4];
-
-	MurmurHash3_x64_128(key,len,seed,temp);
-
-	*(uint32_t*)out = temp[0];
-}
-
-//----------
-
-void MurmurHash3_x64_64 ( const void * key, int len, uint32_t seed, void * out )
-{
-	uint64_t temp[2];
-
-	MurmurHash3_x64_128(key,len,seed,temp);
-
-	*(uint64_t*)out = temp[0];
-} 
 
 //-----------------------------------------------------------------------------
