@@ -1,5 +1,3 @@
-#summary MurmurHash1
-
 = Introduction =
 
 MurmurHash1 was an early experiment to see if I could create a hash function faster than Bob Jenkin's Lookup3. I succeeded, but the lack of a good test suite to determine if it produced acceptable quality hash values was what motivated SMHasher.
