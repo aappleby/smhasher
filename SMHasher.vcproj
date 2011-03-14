@@ -395,6 +395,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Bitslice.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\DifferentialTest.cpp"
 				>
 			</File>
@@ -428,6 +432,14 @@
 			</File>
 			<File
 				RelativePath=".\Bitvec.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Platform.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Platform.h"
 				>
 			</File>
 			<File

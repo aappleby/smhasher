@@ -146,6 +146,17 @@ void flipbit ( void * block, int len, uint32_t bit )
 	if(byte < len) b[byte] ^= (1 << bit);
 }
 
+// from the "Bit Twiddling Hacks" webpage
+
+int countbits ( uint32_t v )
+{
+	v = v - ((v >> 1) & 0x55555555);                    // reuse input as temporary
+	v = (v & 0x33333333) + ((v >> 2) & 0x33333333);     // temp
+	int c = ((v + (v >> 4) & 0xF0F0F0F) * 0x1010101) >> 24; // count
+
+	return c;
+}
+
 //-----------------------------------------------------------------------------
 
 void lshift1 ( void * blob, int len, int c )
