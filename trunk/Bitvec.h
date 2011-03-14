@@ -3,6 +3,7 @@
 #include "pstdint.h"
 
 #include <stdlib.h> // for _rotl, _rotr, etc.
+#include <vector>
 
 //-----------------------------------------------------------------------------
 
@@ -19,6 +20,13 @@ void     setbit      ( void * blob, int len, uint32_t bit, uint32_t val );
 void     clearbit    ( void * blob, int len, uint32_t bit );
 
 void     flipbit     ( void * blob, int len, uint32_t bit );
+
+int      countbits   ( uint32_t v );
+int      countbits   ( std::vector<uint32_t> & v );
+
+int      countbits   ( void * blob, int len );
+
+void     invert      ( std::vector<uint32_t> & v );
 
 //----------
 

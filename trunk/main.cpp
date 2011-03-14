@@ -1,34 +1,15 @@
-#include <stdio.h>
-
+#include "Platform.h"
 #include "hashes.h"
 #include "KeysetTest.h"
 #include "SpeedTest.h"
 #include "AvalancheTest.h"
 #include "DifferentialTest.h"
 
+#include <stdio.h>
 #include <time.h>
-#include <intrin.h>
-#include <windows.h>
-
-#pragma warning(disable : 4127) // "conditional expression is constant" in the if()s for avalanchetest
 
 bool g_testAll = false;
 
-/*
-bool g_testSanity      = true;
-bool g_testSpeed       = true;
-bool g_testDiff        = true;
-bool g_testAvalanche   = true;
-bool g_testCyclic      = true;
-bool g_testSparse      = true;
-bool g_testPermutation = true;
-bool g_testWindow      = true;
-bool g_testText        = true;
-bool g_testZeroes      = true;
-bool g_testSeed        = true;
-*/
-
-//*
 bool g_testSanity      = false;
 bool g_testSpeed       = false;
 bool g_testDiff        = false;
@@ -40,8 +21,8 @@ bool g_testWindow      = false;
 bool g_testText        = false;
 bool g_testZeroes      = false;
 bool g_testSeed        = false;
-//*/
 
+//-----------------------------------------------------------------------------
 
 int64_t g_hashcount = 0;
 int64_t g_bytecount = 0;
@@ -53,7 +34,6 @@ void counterhash ( const void * , const int len, const uint32_t , void * out )
 
 	*(uint32_t*)out = rand_u32();
 }
-
 
 //-----------------------------------------------------------------------------
 
@@ -526,18 +506,14 @@ void testHash ( const char * name )
 }
 //-----------------------------------------------------------------------------
 
-#pragma warning(disable : 4100)
-#pragma warning(disable : 4702)
-
 int main ( int argc, char ** argv )
 {
-	SetProcessAffinityMask(GetCurrentProcess(),2);
+	SetAffinity(2);
 
 	int a = clock();
 
 	g_testAll = true;
 
-	//g_testWindow = true;
 	//g_testSanity = true;
 	//g_testSpeed = true;
 	//g_testAvalanche = true;
@@ -547,35 +523,10 @@ int main ( int argc, char ** argv )
 	//g_testPermutation = true;
 	//g_testZeroes = true;
 
-	//testHash("rand32");
-	//testHash("rand64");
-	//testHash("rand128");
-
-	//testHash("donothing");
-
 	//testHash("count");
-
 	//printf("Called the hash function %I64d times, %I64d bytes hashed\n",g_hashcount,g_bytecount);
 
-	//testHash("crc32");
-	//testHash("rand128");
-
-	//testHash("fnv");
-	//testHash("superfast");
-	//testHash("lookup3");
-	//testHash("MurmurOAAT");
-
-	//testHash("murmur2");
-	//testHash("murmur2B");
-	//testHash("murmur2C");
-
-	testHash("murmur3a");
-	//testHash("murmur3b");
-	//testHash("murmur3c");
-
-	//testHash("murmur3d");
-	//testHash("murmur3e");
-	//testHash("murmur3f");
+	testHash("murmur3f");
 
 	//----------
 
