@@ -1,7 +1,3 @@
-#summary Description and background of the MurmurHash series of hash functions
-
-= Introduction =
-
 There are three versions of MurmurHash -
 
 MurmurHash1 was my first attempt, and was measurably faster than Bob Jenkins' lookup3 but not particularly robust.
