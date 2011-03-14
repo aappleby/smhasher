@@ -12,11 +12,4 @@ h *= m;
 h ^= h >> r;
 }}}
 
-where 'k' is a block of the key, 'm' and 'r' are constants, and 'h' is the 32-bit hash state.
-
-= Details =
-
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+where 'k' is a block of the key, 'm' and 'r' are constants, and 'h' is the 32-bit hash state. This works better than you'd expect given the almost trivial simplicity, but it wasn't dramatically better than previous hash functions and so I kept experimenting.
