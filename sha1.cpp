@@ -10,10 +10,10 @@ Still 100% Public Domain
 
 Corrected a problem which generated improper hash values on 16 bit machines
 Routine SHA1Update changed from
-	void SHA1Update(SHA1_CTX* context, unsigned char* data, unsigned int
+  void SHA1Update(SHA1_CTX* context, unsigned char* data, unsigned int
 len)
 to
-	void SHA1Update(SHA1_CTX* context, unsigned char* data, unsigned
+  void SHA1Update(SHA1_CTX* context, unsigned char* data, unsigned
 long len)
 
 The 'len' parameter was declared an int which works fine on 32 bit machines.
@@ -172,7 +172,7 @@ void SHA1_Init(SHA1_CTX* context)
     context->state[3] = 0x10325476;
     context->state[4] = 0xC3D2E1F0;
     context->count[0] = 0;
-	context->count[1] = 0;
+  context->count[1] = 0;
 }
 
 
@@ -187,12 +187,12 @@ void SHA1_Update(SHA1_CTX* context, const uint8_t* data, const size_t len)
     context->count[1] += (len >> 29);
 
     if ((j + len) > 63) 
-	{
+  {
         memcpy(&context->buffer[j], data, (i = 64-j));
         SHA1_Transform(context->state, context->buffer);
 
         for ( ; i + 63 < len; i += 64) 
-		{
+    {
             SHA1_Transform(context->state, data + i);
         }
 
@@ -235,15 +235,15 @@ void SHA1_Final(SHA1_CTX* context, uint8_t digest[SHA1_DIGEST_SIZE])
 
 void sha1_32a ( const void * key, int len, uint32_t seed, void * out )
 {
-	SHA1_CTX context;
+  SHA1_CTX context;
 
-	uint8_t digest[20];
+  uint8_t digest[20];
 
-	SHA1_Init(&context);
-	SHA1_Update(&context, (uint8_t*)key, len);
-	SHA1_Final(&context, digest);
+  SHA1_Init(&context);
+  SHA1_Update(&context, (uint8_t*)key, len);
+  SHA1_Final(&context, digest);
 
-	memcpy(out,&digest[0],4);
+  memcpy(out,&digest[0],4);
 }
 
 //-----------------------------------------------------------------------------
@@ -292,7 +292,7 @@ int main(int argc, char** argv)
         SHA1_Init(&context);
         SHA1_Update(&context, (uint8_t*)test_data[k], strlen(test_data[k]));
         SHA1_Final(&context, digest);
-	digest_to_hex(digest, output);
+  digest_to_hex(digest, output);
 
         if (strcmp(output, test_results[k])) {
             fprintf(stdout, "FAIL\n");

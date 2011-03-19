@@ -44,25 +44,25 @@ void MurmurHash2A_test     ( const void * key, int len, uint32_t seed, void * ou
 
 inline void MurmurHash1_test ( const void * key, int len, uint32_t seed, void * out )
 {
-	*(uint32_t*)out = MurmurHash1(key,len,seed);
+  *(uint32_t*)out = MurmurHash1(key,len,seed);
 }
 
 inline void MurmurHash2_test ( const void * key, int len, uint32_t seed, void * out )
 {
-	*(uint32_t*)out = MurmurHash2(key,len,seed);
+  *(uint32_t*)out = MurmurHash2(key,len,seed);
 }
 
 inline void MurmurHash2A_test ( const void * key, int len, uint32_t seed, void * out )
 {
-	*(uint32_t*)out = MurmurHash2A(key,len,seed);
+  *(uint32_t*)out = MurmurHash2A(key,len,seed);
 }
 
 inline void MurmurHash64A_test ( const void * key, int len, uint32_t seed, void * out )
 {
-	*(uint64_t*)out = MurmurHash64A(key,len,seed);
+  *(uint64_t*)out = MurmurHash64A(key,len,seed);
 }
 
 inline void MurmurHash64B_test ( const void * key, int len, uint32_t seed, void * out )
 {
-	*(uint64_t*)out = MurmurHash64B(key,len,seed);
+  *(uint64_t*)out = MurmurHash64B(key,len,seed);
 }

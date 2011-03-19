@@ -15,7 +15,7 @@ void testRDTSC ( void )
 
 void SetAffinity ( int cpu )
 {
-	SetProcessAffinityMask(GetCurrentProcess(),cpu);
+  SetProcessAffinityMask(GetCurrentProcess(),cpu);
 }
 
 #else

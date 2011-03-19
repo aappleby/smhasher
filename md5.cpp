@@ -363,20 +363,20 @@ void md5( unsigned char *input, int ilen, unsigned char output[16] )
 
 unsigned int md5hash ( const void * input, int len, unsigned int /*seed*/ )
 {
-	unsigned int hash[4];
+  unsigned int hash[4];
 
-	md5((unsigned char *)input,len,(unsigned char *)hash);
+  md5((unsigned char *)input,len,(unsigned char *)hash);
 
-	//return hash[0] ^ hash[1] ^ hash[2] ^ hash[3];
+  //return hash[0] ^ hash[1] ^ hash[2] ^ hash[3];
 
-	return hash[0];
+  return hash[0];
 }	
 
 void md5_32            ( const void * key, int len, uint32_t /*seed*/, void * out )
 {
-	unsigned int hash[4];
+  unsigned int hash[4];
 
-	md5((unsigned char*)key,len,(unsigned char*)hash);
+  md5((unsigned char*)key,len,(unsigned char*)hash);
 
-	*(uint32_t*)out = hash[0];
+  *(uint32_t*)out = hash[0];
 }

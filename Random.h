@@ -8,84 +8,84 @@
 
 struct Rand
 {
-	uint32_t x;
-	uint32_t y;
-	uint32_t z;
-	uint32_t w;
+  uint32_t x;
+  uint32_t y;
+  uint32_t z;
+  uint32_t w;
 
-	Rand()
-	{
-		reseed(uint32_t(0));
-	}
+  Rand()
+  {
+    reseed(uint32_t(0));
+  }
 
-	Rand( uint32_t seed )
-	{
-		reseed(seed);
-	}
+  Rand( uint32_t seed )
+  {
+    reseed(seed);
+  }
 
-	void reseed ( uint32_t seed )
-	{
-		x = 0x498b3bc5 ^ seed;
-		y = 0;
-		z = 0;
-		w = 0;
+  void reseed ( uint32_t seed )
+  {
+    x = 0x498b3bc5 ^ seed;
+    y = 0;
+    z = 0;
+    w = 0;
 
-		for(int i = 0; i < 10; i++) mix();
-	}
+    for(int i = 0; i < 10; i++) mix();
+  }
 
-	void reseed ( uint64_t seed )
-	{
-		x = 0x498b3bc5 ^ (uint32_t)(seed >>  0);
-		y = 0x5a05089a ^ (uint32_t)(seed >> 32);
-		z = 0;
-		w = 0;
+  void reseed ( uint64_t seed )
+  {
+    x = 0x498b3bc5 ^ (uint32_t)(seed >>  0);
+    y = 0x5a05089a ^ (uint32_t)(seed >> 32);
+    z = 0;
+    w = 0;
 
-		for(int i = 0; i < 10; i++) mix();
-	}
+    for(int i = 0; i < 10; i++) mix();
+  }
 
-	//-----------------------------------------------------------------------------
+  //-----------------------------------------------------------------------------
 
-	void mix ( void )
-	{
-		uint32_t t = x ^ (x << 11);
-		x = y; y = z; z = w;
-		w = w ^ (w >> 19) ^ t ^ (t >> 8); 
-	}
+  void mix ( void )
+  {
+    uint32_t t = x ^ (x << 11);
+    x = y; y = z; z = w;
+    w = w ^ (w >> 19) ^ t ^ (t >> 8); 
+  }
 
-	uint32_t rand_u32 ( void )
-	{
-		mix();
+  uint32_t rand_u32 ( void )
+  {
+    mix();
 
-		return x;
-	}
+    return x;
+  }
 
-	uint64_t rand_u64 ( void ) 
-	{
-		mix();
+  uint64_t rand_u64 ( void ) 
+  {
+    mix();
 
-		uint64_t a = x;
-		uint64_t b = y;
+    uint64_t a = x;
+    uint64_t b = y;
 
-		return (a << 32) | b;
-	}
+    return (a << 32) | b;
+  }
 
-	void rand_p ( void * blob, int bytes )
-	{
-		uint32_t * blocks = (uint32_t*)blob;
+  void rand_p ( void * blob, int bytes )
+  {
+    uint32_t * blocks = (uint32_t*)blob;
 
-		while(bytes >= 4)
-		{
-			*blocks++ = rand_u32();
-			bytes -= 4;
-		}
+    while(bytes >= 4)
+    {
+      *blocks++ = rand_u32();
+      bytes -= 4;
+    }
 
-		uint8_t * tail = (uint8_t*)blocks;
+    uint8_t * tail = (uint8_t*)blocks;
 
-		for(int i = 0; i < bytes; i++)
-		{
-			tail[i] = (uint8_t)rand_u32();
-		}
-	}
+    for(int i = 0; i < bytes; i++)
+    {
+      tail[i] = (uint8_t)rand_u32();
+    }
+  }
 };
 
 //-----------------------------------------------------------------------------
@@ -97,20 +97,20 @@ inline uint64_t rand_u64 ( void ) { return g_rand1.rand_u64(); }
 
 inline void rand_p ( void * blob, int bytes )
 {
-	uint32_t * blocks = (uint32_t*)blob;
+  uint32_t * blocks = (uint32_t*)blob;
 
-	while(bytes >= 4)
-	{
-		*blocks++ = rand_u32();
-		bytes -= 4;
-	}
+  while(bytes >= 4)
+  {
+    *blocks++ = rand_u32();
+    bytes -= 4;
+  }
 
-	uint8_t * tail = (uint8_t*)blocks;
+  uint8_t * tail = (uint8_t*)blocks;
 
-	for(int i = 0; i < bytes; i++)
-	{
-		tail[i] = (uint8_t)rand_u32();
-	}
+  for(int i = 0; i < bytes; i++)
+  {
+    tail[i] = (uint8_t)rand_u32();
+  }
 }
 
 //-----------------------------------------------------------------------------
