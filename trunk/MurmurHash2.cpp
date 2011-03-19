@@ -379,7 +379,7 @@ uint32_t MurmurHashAligned2 ( const void * key, int len, uint32_t seed )
 
 	uint32_t h = seed ^ len;
 
-	int align = (int)data & 3;
+	int align = (uint64_t)data & 3;
 
 	if(align && (len >= 4))
 	{
