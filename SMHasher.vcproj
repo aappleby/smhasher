@@ -327,10 +327,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\crc.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Hashes.cpp"
 				>
 			</File>

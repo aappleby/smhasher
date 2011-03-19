@@ -1,3 +1,5 @@
+#include "Platform.h"
+
 /*
  * This file is derived from crc32.c from the zlib-1.1.3 distribution
  * by Jean-loup Gailly and Mark Adler.
@@ -7,9 +9,6 @@
  * Copyright (C) 1995-1998 Mark Adler
  * For conditions of distribution and use, see copyright notice in zlib.h
  */
-
-typedef unsigned long uint32_t;
-typedef unsigned char uint8_t;
 
 
 /* ========================================================================

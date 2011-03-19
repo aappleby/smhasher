@@ -6,8 +6,8 @@
 #include <stdlib.h>
 //#include <stdint.h>
 #include <assert.h>
-#include <emmintrin.h>
-#include <xmmintrin.h>
+//#include <emmintrin.h>
+//#include <xmmintrin.h>
 
 //----------------------------------------------------------------------------
 // fake / bad hashes
@@ -110,7 +110,7 @@ void FNV ( const void * key, int len, uint32_t seed, void * out )
 
 	const uint8_t * data = (const uint8_t*)key;
 
-	h ^= 2166136261;
+	h ^= BIG_CONSTANT(2166136261);
 
 	for(int i = 0; i < len; i++)
 	{

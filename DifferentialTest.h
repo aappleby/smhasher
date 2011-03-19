@@ -5,7 +5,12 @@
 #pragma once
 
 #include "Types.h"
+#include "Stats.h"      // for chooseUpToK
+#include "KeysetTest.h" // for SparseKeygenRecurse
+
 #include <vector>
+#include <algorithm>
+#include <stdio.h>
 
 //-----------------------------------------------------------------------------
 // Sort through the differentials, ignoring collisions that only occured once 

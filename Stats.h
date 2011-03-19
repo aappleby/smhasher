@@ -4,7 +4,10 @@
 
 #include <math.h>
 #include <vector>
+#include <map>
 #include <algorithm>   // for std::sort
+#include <string.h>    // for memset
+#include <stdio.h>     // for printf
 
 double calcScore ( const int * bins, const int bincount, const int ballcount );
 
@@ -63,22 +66,22 @@ int PrintCollisions ( hashfunc<hashtype> hash, std::vector<keytype> & keys )
 	{
 		keytype & k1 = keys[i];
 
-		hashtype h = hash(&k1,sizeof(k),0);
+		hashtype h = hash(&k1,sizeof(keytype),0);
 
-		htab::iterator it = tab.find(h);
+		typename htab::iterator it = tab.find(h);
 
 		if(it != tab.end())
 		{
 			keytype & k2 = (*it).second;
 
 			printf("A: ");
-			printbits(&k1,sizeof(k1));
+			printbits(&k1,sizeof(keytype));
 			printf("B: ");
-			printbits(&k2,sizeof(k2));
+			printbits(&k2,sizeof(keytype));
 		}
 		else
 		{
-			htab.insert( htab::value_type(h,k) );
+      tab.insert( std::make_pair(h,k1) );
 		}
 	}
 
@@ -338,7 +341,7 @@ void TestDistributionFast ( std::vector<hashtype> & hashes, double & dworst, dou
 			bins[index]++;
 		}
 
-		double n = calcScore(bins,(int)hashes.size());
+		double n = calcScore((int*)bins.begin(),(int)hashes.size(),(int)bins.size());
 		
 		davg += n;
 

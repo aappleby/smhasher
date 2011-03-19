@@ -75,7 +75,7 @@ uint32_t MurmurHash2 ( const void * key, int len, uint32_t seed )
 
 uint64_t MurmurHash64A ( const void * key, int len, uint64_t seed )
 {
-	const uint64_t m = 0xc6a4a7935bd1e995;
+	const uint64_t m = BIG_CONSTANT(0xc6a4a7935bd1e995);
 	const int r = 47;
 
 	uint64_t h = seed ^ (len * m);

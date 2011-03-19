@@ -1,9 +1,5 @@
 #include "AvalancheTest.h"
 
-#include "Random.h"
-
-#include <math.h>
-
 //-----------------------------------------------------------------------------
 
 void PrintAvalancheDiagram ( int x, int y, int reps, double scale, int * bins )

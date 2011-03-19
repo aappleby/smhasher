@@ -88,7 +88,7 @@ A million repetitions of "a"
 
 void SHA1_Transform(uint32_t state[5], const uint8_t buffer[64]);
 
-#define rol _rotl
+#define rol ROTL32
 
 /* blk0() and blk() perform the initial expand. */
 /* I got the idea of expanding during the round function from SSLeay */

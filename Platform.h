@@ -1,4 +1,7 @@
+//-----------------------------------------------------------------------------
 // Platform-specific functions and macros
+
+#pragma once
 
 void SetAffinity ( int cpu );
 
@@ -10,16 +13,24 @@ void SetAffinity ( int cpu );
 #define FORCE_INLINE	__forceinline
 
 #include <stdlib.h>
+#include <math.h>   // Has to be included before intrin.h or VC complains about 'ceil'
+#include <intrin.h> // for __rdtsc
 #include "pstdint.h"
 
 #define ROTL32(x,y)	_rotl(x,y)
 #define ROTL64(x,y)	_rotl64(x,y)
+#define ROTR32(x,y)	_rotr(x,y)
+#define ROTR64(x,y)	_rotr64(x,y)
 
 #pragma warning(disable : 4127) // "conditional expression is constant" in the if()s for avalanchetest
 #pragma warning(disable : 4100)
 #pragma warning(disable : 4702)
 
 #define BIG_CONSTANT(x) (x)
+
+// RDTSC == Read Time Stamp Counter
+
+#define rdtsc() __rdtsc()
 
 //-----------------------------------------------------------------------------
 // Other compilers
@@ -30,19 +41,43 @@ void SetAffinity ( int cpu );
 
 #define	FORCE_INLINE __attribute__((always_inline))
 
-uint32_t inline rotl32 ( uint32_t x, int8_t r )
+inline uint32_t rotl32 ( uint32_t x, int8_t r )
 {
 	return (x << r) | (x >> (32 - r));
 }
 
-uint64_t inline rotl64 ( uint64_t x, int8_t r )
+inline uint64_t rotl64 ( uint64_t x, int8_t r )
 {
 	return (x << r) | (x >> (64 - r));
 }
 
+inline uint32_t rotr32 ( uint32_t x, int8_t r )
+{
+	return (x >> r) | (x << (32 - r));
+}
+
+inline uint64_t rotr64 ( uint64_t x, int8_t r )
+{
+	return (x >> r) | (x << (64 - r));
+}
+
 #define	ROTL32(x,y)	rotl32(x,y)
 #define ROTL64(x,y)	rotl64(x,y)
+#define	ROTR32(x,y)	rotr32(x,y)
+#define ROTR64(x,y)	rotr64(x,y)
 
 #define BIG_CONSTANT(x) (x##LLU)
 
+__inline__ unsigned long long int rdtsc()
+{
+    unsigned long long int x;
+    __asm__ volatile ("rdtsc" : "=A" (x));
+    return x;
+}
+
+#include <strings.h>
+#define _stricmp strcasecmp
+
 #endif	//	!defined(_MSC_VER)
+
+//-----------------------------------------------------------------------------

@@ -1,8 +1,7 @@
 #pragma once
 
-#include "pstdint.h"
+#include "Platform.h"
 
-#include <stdlib.h> // for _rotl, _rotr, etc.
 #include <vector>
 
 //-----------------------------------------------------------------------------
@@ -190,10 +189,10 @@ inline void rrot ( T & blob, int c )
 	}
 }
 
-template<> inline void lrot ( uint32_t & blob, int c ) { blob = _rotl(blob,c); }
-template<> inline void lrot ( uint64_t & blob, int c ) { blob = _rotl64(blob,c); }
-template<> inline void rrot ( uint32_t & blob, int c ) { blob = _rotr(blob,c); }
-template<> inline void rrot ( uint64_t & blob, int c ) { blob = _rotr64(blob,c); }
+template<> inline void lrot ( uint32_t & blob, int c ) { blob = ROTL32(blob,c); }
+template<> inline void lrot ( uint64_t & blob, int c ) { blob = ROTL64(blob,c); }
+template<> inline void rrot ( uint32_t & blob, int c ) { blob = ROTR32(blob,c); }
+template<> inline void rrot ( uint64_t & blob, int c ) { blob = ROTR64(blob,c); }
 
 //-----------------------------------------------------------------------------
 // Bit-windowing functions - select some N-bit subset of the input blob
@@ -230,13 +229,13 @@ inline uint32_t window ( T & blob, int start, int count )
 template<> 
 inline uint32_t window ( uint32_t & blob, int start, int count )
 {
-	return _rotr(blob,start) & ((1<<count)-1);
+	return ROTR32(blob,start) & ((1<<count)-1);
 }
 
 template<> 
 inline uint32_t window ( uint64_t & blob, int start, int count )
 {
-	return (uint32_t)_rotr64(blob,start) & ((1<<count)-1);
+	return (uint32_t)ROTR64(blob,start) & ((1<<count)-1);
 }
 
 //-----------------------------------------------------------------------------

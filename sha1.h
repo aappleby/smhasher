@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "pstdint.h"
+#include "Platform.h"
 
 struct SHA1_CTX
 {
