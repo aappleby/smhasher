@@ -9,6 +9,7 @@
 
 #include "Types.h"
 #include "Stats.h"
+#include "Random.h"   // for rand_p
 
 #include <algorithm>  // for std::swap
 

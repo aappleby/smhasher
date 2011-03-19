@@ -1,5 +1,5 @@
 #include "Platform.h"
-#include "hashes.h"
+#include "Hashes.h"
 #include "KeysetTest.h"
 #include "SpeedTest.h"
 #include "AvalancheTest.h"
@@ -128,6 +128,7 @@ void test ( hashfunc<hashtype> hash, const char * hashname )
 			TinySpeedTest(hash,sizeof(hashtype),i,true,cycles);
 		}
 
+    /*
 		for(int i = 32; i <= 2048; i += 32)
 		{
 			double cycles;
@@ -135,6 +136,7 @@ void test ( hashfunc<hashtype> hash, const char * hashname )
 
 			TinySpeedTest(hash,sizeof(hashtype),i,true,cycles);
 		}
+    */
 
 		printf("\n");
 	}
@@ -169,6 +171,7 @@ void test ( hashfunc<hashtype> hash, const char * hashname )
 		//const int hashbits = sizeof(hashtype) * 8;
 		bool result = true;
 
+    /*
 		result &= AvalancheTest< Blob< 32>, hashtype > (hash,300000);
 		result &= AvalancheTest< Blob< 40>, hashtype > (hash,300000);
 		result &= AvalancheTest< Blob< 48>, hashtype > (hash,300000);
@@ -182,13 +185,16 @@ void test ( hashfunc<hashtype> hash, const char * hashname )
 		result &= AvalancheTest< Blob<104>, hashtype > (hash,300000);
 		result &= AvalancheTest< Blob<112>, hashtype > (hash,300000);
 		result &= AvalancheTest< Blob<120>, hashtype > (hash,300000);
+    */
 
 		result &= AvalancheTest< Blob<128>, hashtype > (hash,300000);
 		result &= AvalancheTest< Blob<136>, hashtype > (hash,300000);
 		result &= AvalancheTest< Blob<144>, hashtype > (hash,300000);
 		result &= AvalancheTest< Blob<152>, hashtype > (hash,300000);
 		result &= AvalancheTest< Blob<160>, hashtype > (hash,300000);
-		result &= AvalancheTest< Blob<168>, hashtype > (hash,300000);
+
+    /*
+    result &= AvalancheTest< Blob<168>, hashtype > (hash,300000);
 		result &= AvalancheTest< Blob<176>, hashtype > (hash,300000);
 		result &= AvalancheTest< Blob<184>, hashtype > (hash,300000);
 		result &= AvalancheTest< Blob<192>, hashtype > (hash,300000);
@@ -201,6 +207,7 @@ void test ( hashfunc<hashtype> hash, const char * hashname )
 		result &= AvalancheTest< Blob<248>, hashtype > (hash,300000);
 
 		result &= AvalancheTest< Blob<256>, hashtype > (hash,300000);
+    */
 
 		//result &= AvalancheTest< Blob<hashbits * 2>, hashtype > (hash,200000);
 		//result &= AvalancheTest< Blob<768>, hashtype > (hash,2000000);
@@ -510,7 +517,7 @@ int main ( int argc, char ** argv )
 {
 	SetAffinity(2);
 
-	int a = clock();
+	int timeBegin = clock();
 
 	g_testAll = true;
 
@@ -526,13 +533,14 @@ int main ( int argc, char ** argv )
 	//testHash("count");
 	//printf("Called the hash function %I64d times, %I64d bytes hashed\n",g_hashcount,g_bytecount);
 
-	testHash("murmur3f");
+	testHash("murmur3a");
 
 	//----------
 
-	int b = clock();
+	int timeEnd = clock();
 
-	printf("time %d\n",b-a);
-
+  printf("\n");
+	printf("Testing took %f seconds\n",double(timeEnd-timeBegin)/double(CLOCKS_PER_SEC));
+  printf("-------------------------------------------------------------------------------\n");
 	return 0;
 }

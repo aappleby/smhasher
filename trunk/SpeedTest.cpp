@@ -3,7 +3,6 @@
 #include "Random.h"
 
 #include <stdio.h>  // for printf
-#include <intrin.h> // for __rdtsc
 
 //-----------------------------------------------------------------------------
 // 256k blocks seem to give the best results.
@@ -27,13 +26,13 @@ void BulkSpeedTest ( pfHash hash )
 
 		for(int itrial = 0; itrial < trials; itrial++)
 		{
-			__int64 begin,end;
+			int64_t begin,end;
 
-			begin = __rdtsc();
+			begin = rdtsc();
 
 			hash(block + align,blocksize,itrial,temp);
 
-			end = __rdtsc();
+			end = rdtsc();
 
 			blackhole(temp[0]);
 
@@ -64,11 +63,11 @@ void TinySpeedTest ( pfHash hash, int hashsize, int keysize, bool verbose, doubl
 
 	for(int itrial = 0; itrial < trials; itrial++)
 	{
-		__int64 begin,end;
+		int64_t begin,end;
 
 		rand_p(k,keysize);
 
-		begin = __rdtsc();
+		begin = rdtsc();
 		
 		hash(k,keysize,itrial,h);   hash(k,keysize,itrial,h);   hash(k,keysize,itrial,h);   hash(k,keysize,itrial,h);
 		hash(k,keysize,itrial,h);   hash(k,keysize,itrial,h);   hash(k,keysize,itrial,h);   hash(k,keysize,itrial,h);
@@ -90,7 +89,7 @@ void TinySpeedTest ( pfHash hash, int hashsize, int keysize, bool verbose, doubl
 		hash(k,keysize,itrial,h);   hash(k,keysize,itrial,h);   hash(k,keysize,itrial,h);   hash(k,keysize,itrial,h);
 		hash(k,keysize,itrial,h);   hash(k,keysize,itrial,h);   hash(k,keysize,itrial,h);   hash(k,keysize,itrial,h);
 
-		end = __rdtsc();
+		end = rdtsc();
 
 		//blackhole(*(uint32_t*)(&h));
 

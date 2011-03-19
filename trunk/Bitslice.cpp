@@ -55,21 +55,21 @@ void Bitslice ( std::vector<hashtype> & hashes, slice_vec & slices )
 {
 	const int hashbytes = sizeof(hashtype);
 	const int hashbits = hashbytes * 8;
-	const int slicelen = (hashes.size() + 31) / 32;
+	const int slicelen = ((int)hashes.size() + 31) / 32;
 
 	slices.clear();
 	slices.resize(hashbits);
 
-	for(size_t i = 0; i < slices.size(); i++)
+	for(int i = 0; i < (int)slices.size(); i++)
 	{
 		slices[i].resize(slicelen,0);
 	}
 
-	for(size_t j = 0; j < hashbits; j++)
+	for(int j = 0; j < hashbits; j++)
 	{
 		void * sliceblob = &(slices[j][0]);
 
-		for(size_t i = 0; i < hashes.size(); i++)
+		for(int i = 0; i < (int)hashes.size(); i++)
 		{
 			int b = getbit(hashes[i],j);
 
@@ -94,9 +94,9 @@ void FactorSlices ( slice_vec & slices )
 		int bestA = -1;
 		int bestB = -1;
 
-		for(size_t j = 0; j < slices.size()-1; j++)
+		for(int j = 0; j < (int)slices.size()-1; j++)
 		{
-			for(size_t i = j+1; i < slices.size(); i++)
+			for(int i = j+1; i < (int)slices.size(); i++)
 			{
 				int d = countxor(slices[i],slices[j]);
 

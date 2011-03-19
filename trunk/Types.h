@@ -1,6 +1,6 @@
 #pragma once
 
-#include "pstdint.h"
+#include "Platform.h"
 #include "Bitvec.h"
 
 //-----------------------------------------------------------------------------

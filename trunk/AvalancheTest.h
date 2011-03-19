@@ -11,7 +11,10 @@
 
 #include "Types.h"
 #include "Random.h"
+
 #include <vector>
+#include <stdio.h>
+#include <math.h>
 
 // Avalanche fails if a bit is biased by more than 1%
 

@@ -615,13 +615,13 @@ bool test_shift ( void )
 			b = a; rshift8  (&b,nbytes,i);  assert(b == (a >> i));
 			b = a; rshift32 (&b,nbytes,i);  assert(b == (a >> i));
 
-			b = a; lrot1    (&b,nbytes,i);  assert(b == _rotl64(a,i));
-			b = a; lrot8    (&b,nbytes,i);  assert(b == _rotl64(a,i));
-			b = a; lrot32   (&b,nbytes,i);  assert(b == _rotl64(a,i));
+			b = a; lrot1    (&b,nbytes,i);  assert(b == ROTL64(a,i));
+			b = a; lrot8    (&b,nbytes,i);  assert(b == ROTL64(a,i));
+			b = a; lrot32   (&b,nbytes,i);  assert(b == ROTL64(a,i));
 
-			b = a; rrot1    (&b,nbytes,i);  assert(b == _rotr64(a,i));
-			b = a; rrot8    (&b,nbytes,i);  assert(b == _rotr64(a,i));
-			b = a; rrot32   (&b,nbytes,i);  assert(b == _rotr64(a,i));
+			b = a; rrot1    (&b,nbytes,i);  assert(b == ROTR64(a,i));
+			b = a; rrot8    (&b,nbytes,i);  assert(b == ROTR64(a,i));
+			b = a; rrot32   (&b,nbytes,i);  assert(b == ROTR64(a,i));
 		}
 	}
 
@@ -686,7 +686,7 @@ bool test_window ( void )
 		{
 			for(int count = 0; count < 32; count++)
 			{
-				uint32_t a = (uint32_t)_rotr64(x,start);
+				uint32_t a = (uint32_t)ROTR64(x,start);
 				a &= ((1 << count)-1);
 				
 				uint32_t b = window1 (&x,nbytes,start,count);
