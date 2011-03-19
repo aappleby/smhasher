@@ -32,7 +32,7 @@ void     invert      ( std::vector<uint32_t> & v );
 template< typename T >
 inline uint32_t getbit ( T & blob, uint32_t bit )
 {
-	return getbit(&blob,sizeof(blob),bit);
+  return getbit(&blob,sizeof(blob),bit);
 }
 
 template<> inline uint32_t getbit ( uint32_t & blob, uint32_t bit ) { return (blob >> (bit & 31)) & 1; }
@@ -43,7 +43,7 @@ template<> inline uint32_t getbit ( uint64_t & blob, uint32_t bit ) { return (bl
 template< typename T >
 inline void setbit ( T & blob, uint32_t bit )
 {
-	return setbit(&blob,sizeof(blob),bit);
+  return setbit(&blob,sizeof(blob),bit);
 }
 
 template<> inline void setbit ( uint32_t & blob, uint32_t bit ) { blob |= uint32_t(1) << (bit & 31); }
@@ -54,7 +54,7 @@ template<> inline void setbit ( uint64_t & blob, uint32_t bit ) { blob |= uint64
 template< typename T >
 inline void flipbit ( T & blob, uint32_t bit )
 {
-	flipbit(&blob,sizeof(blob),bit);
+  flipbit(&blob,sizeof(blob),bit);
 }
 
 template<> inline void flipbit ( uint32_t & blob, uint32_t bit ) { bit &= 31; blob ^= (uint32_t(1) << bit); }
@@ -74,52 +74,52 @@ void rshift32 ( void * blob, int len, int c );
 
 inline void lshift ( void * blob, int len, int c )
 {
-	if((len & 3) == 0)
-	{
-		lshift32(blob,len,c);
-	}
-	else
-	{
-		lshift8(blob,len,c);
-	}
+  if((len & 3) == 0)
+  {
+    lshift32(blob,len,c);
+  }
+  else
+  {
+    lshift8(blob,len,c);
+  }
 }
 
 inline void rshift ( void * blob, int len, int c )
 {
-	if((len & 3) == 0)
-	{
-		rshift32(blob,len,c);
-	}
-	else
-	{
-		rshift8(blob,len,c);
-	}
+  if((len & 3) == 0)
+  {
+    rshift32(blob,len,c);
+  }
+  else
+  {
+    rshift8(blob,len,c);
+  }
 }
 
 template < typename T >
 inline void lshift ( T & blob, int c )
 {
-	if((sizeof(T) & 3) == 0)
-	{
-		lshift32(&blob,sizeof(T),c);
-	}
-	else
-	{
-		lshift8(&blob,sizeof(T),c);
-	}
+  if((sizeof(T) & 3) == 0)
+  {
+    lshift32(&blob,sizeof(T),c);
+  }
+  else
+  {
+    lshift8(&blob,sizeof(T),c);
+  }
 }
 
 template < typename T >
 inline void rshift ( T & blob, int c )
 {
-	if((sizeof(T) & 3) == 0)
-	{
-		lshift32(&blob,sizeof(T),c);
-	}
-	else
-	{
-		lshift8(&blob,sizeof(T),c);
-	}
+  if((sizeof(T) & 3) == 0)
+  {
+    lshift32(&blob,sizeof(T),c);
+  }
+  else
+  {
+    lshift8(&blob,sizeof(T),c);
+  }
 }
 
 template<> inline void lshift ( uint32_t & blob, int c ) { blob <<= c; }
@@ -141,52 +141,52 @@ void rrot32   ( void * blob, int len, int c );
 
 inline void lrot ( void * blob, int len, int c )
 {
-	if((len & 3) == 0)
-	{
-		return lrot32(blob,len,c);
-	}
-	else
-	{
-		return lrot8(blob,len,c);
-	}
+  if((len & 3) == 0)
+  {
+    return lrot32(blob,len,c);
+  }
+  else
+  {
+    return lrot8(blob,len,c);
+  }
 }
 
 inline void rrot ( void * blob, int len, int c )
 {
-	if((len & 3) == 0)
-	{
-		return rrot32(blob,len,c);
-	}
-	else
-	{
-		return rrot8(blob,len,c);
-	}
+  if((len & 3) == 0)
+  {
+    return rrot32(blob,len,c);
+  }
+  else
+  {
+    return rrot8(blob,len,c);
+  }
 }
 
 template < typename T >
 inline void lrot ( T & blob, int c )
 {
-	if((sizeof(T) & 3) == 0)
-	{
-		return lrot32(&blob,sizeof(T),c);
-	}
-	else
-	{
-		return lrot8(&blob,sizeof(T),c);
-	}
+  if((sizeof(T) & 3) == 0)
+  {
+    return lrot32(&blob,sizeof(T),c);
+  }
+  else
+  {
+    return lrot8(&blob,sizeof(T),c);
+  }
 }
 
 template < typename T >
 inline void rrot ( T & blob, int c )
 {
-	if((sizeof(T) & 3) == 0)
-	{
-		return rrot32(&blob,sizeof(T),c);
-	}
-	else
-	{
-		return rrot8(&blob,sizeof(T),c);
-	}
+  if((sizeof(T) & 3) == 0)
+  {
+    return rrot32(&blob,sizeof(T),c);
+  }
+  else
+  {
+    return rrot8(&blob,sizeof(T),c);
+  }
 }
 
 template<> inline void lrot ( uint32_t & blob, int c ) { blob = ROTL32(blob,c); }
@@ -203,39 +203,39 @@ uint32_t window32 ( void * blob, int len, int start, int count );
 
 inline uint32_t window ( void * blob, int len, int start, int count )
 {
-	if(len & 3)
-	{
-		return window8(blob,len,start,count);
-	}
-	else
-	{
-		return window32(blob,len,start,count);
-	}
+  if(len & 3)
+  {
+    return window8(blob,len,start,count);
+  }
+  else
+  {
+    return window32(blob,len,start,count);
+  }
 }
 
 template < typename T >
 inline uint32_t window ( T & blob, int start, int count )
 {
-	if((sizeof(T) & 3) == 0)
-	{
-		return window32(&blob,sizeof(T),start,count);
-	}
-	else
-	{
-		return window8(&blob,sizeof(T),start,count);
-	}
+  if((sizeof(T) & 3) == 0)
+  {
+    return window32(&blob,sizeof(T),start,count);
+  }
+  else
+  {
+    return window8(&blob,sizeof(T),start,count);
+  }
 }
 
 template<> 
 inline uint32_t window ( uint32_t & blob, int start, int count )
 {
-	return ROTR32(blob,start) & ((1<<count)-1);
+  return ROTR32(blob,start) & ((1<<count)-1);
 }
 
 template<> 
 inline uint32_t window ( uint64_t & blob, int start, int count )
 {
-	return (uint32_t)ROTR64(blob,start) & ((1<<count)-1);
+  return (uint32_t)ROTR64(blob,start) & ((1<<count)-1);
 }
 
 //-----------------------------------------------------------------------------

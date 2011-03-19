@@ -20,75 +20,75 @@
 template < class keytype >
 bool ProcessDifferentials ( std::vector<keytype> & diffs, int reps, bool dumpCollisions )
 {
-	std::sort(diffs.begin(), diffs.end());
+  std::sort(diffs.begin(), diffs.end());
 
-	int count = 1;
-	int ignore = 0;
+  int count = 1;
+  int ignore = 0;
 
-	bool result = true;
+  bool result = true;
 
-	if(diffs.size())
-	{
-		keytype kp = diffs[0];
+  if(diffs.size())
+  {
+    keytype kp = diffs[0];
 
-		for(int i = 1; i < (int)diffs.size(); i++)
-		{
-			if(diffs[i] == kp)
-			{
-				count++;
-				continue;
-			}
-			else
-			{
-				if(count > 1)
-				{
-					result = false;
+    for(int i = 1; i < (int)diffs.size(); i++)
+    {
+      if(diffs[i] == kp)
+      {
+        count++;
+        continue;
+      }
+      else
+      {
+        if(count > 1)
+        {
+          result = false;
 
-					double pct = 100 * (double(count) / double(reps));
+          double pct = 100 * (double(count) / double(reps));
 
-					if(dumpCollisions)
-					{
-						printbits((unsigned char*)&kp,sizeof(kp));
-						printf(" - %4.2f%%\n", pct );
-					}
-				}
-				else 
-				{
-					ignore++;
-				}
+          if(dumpCollisions)
+          {
+            printbits((unsigned char*)&kp,sizeof(kp));
+            printf(" - %4.2f%%\n", pct );
+          }
+        }
+        else 
+        {
+          ignore++;
+        }
 
-				kp = diffs[i];
-				count = 1;
-			}
-		}
+        kp = diffs[i];
+        count = 1;
+      }
+    }
 
-		if(count > 1)
-		{
-			double pct = 100 * (double(count) / double(reps));
+    if(count > 1)
+    {
+      double pct = 100 * (double(count) / double(reps));
 
-			if(dumpCollisions)
-			{
-				printbits((unsigned char*)&kp,sizeof(kp));
-				printf(" - %4.2f%%\n", pct );
-			}
-		}
-		else 
-		{
-			ignore++;
-		}
-	}
+      if(dumpCollisions)
+      {
+        printbits((unsigned char*)&kp,sizeof(kp));
+        printf(" - %4.2f%%\n", pct );
+      }
+    }
+    else 
+    {
+      ignore++;
+    }
+  }
 
-	printf("%d total collisions, of which %d single collisions were ignored",(int)diffs.size(),ignore);
+  printf("%d total collisions, of which %d single collisions were ignored",(int)diffs.size(),ignore);
 
-	if(result == false)
-	{
-		printf(" !!!!! ");
-	}
+  if(result == false)
+  {
+    printf(" !!!!! ");
+  }
 
-	printf("\n");
-	printf("\n");
+  printf("\n");
+  printf("\n");
 
-	return result;
+  return result;
 }
 
 //-----------------------------------------------------------------------------
@@ -102,28 +102,28 @@ bool ProcessDifferentials ( std::vector<keytype> & diffs, int reps, bool dumpCol
 template < typename keytype, typename hashtype >
 void DiffTestRecurse ( pfHash hash, keytype & k1, keytype & k2, hashtype & h1, hashtype & h2, int start, int bitsleft, std::vector<keytype> & diffs )
 {
-	const int bits = sizeof(keytype)*8;
+  const int bits = sizeof(keytype)*8;
 
-	for(int i = start; i < bits; i++)
-	{
-		flipbit(&k2,sizeof(k2),i);
-		bitsleft--;
+  for(int i = start; i < bits; i++)
+  {
+    flipbit(&k2,sizeof(k2),i);
+    bitsleft--;
 
-		hash(&k2,sizeof(k2),0,&h2);
+    hash(&k2,sizeof(k2),0,&h2);
 
-		if(h1 == h2)
-		{
-			diffs.push_back(k1 ^ k2);
-		}
+    if(h1 == h2)
+    {
+      diffs.push_back(k1 ^ k2);
+    }
 
-		if(bitsleft)
-		{
-			DiffTestRecurse(hash,k1,k2,h1,h2,i+1,bitsleft,diffs);
-		}
+    if(bitsleft)
+    {
+      DiffTestRecurse(hash,k1,k2,h1,h2,i+1,bitsleft,diffs);
+    }
 
-		flipbit(&k2,sizeof(k2),i);
-		bitsleft++;
-	}
+    flipbit(&k2,sizeof(k2),i);
+    bitsleft++;
+  }
 }
 
 //----------
@@ -131,39 +131,39 @@ void DiffTestRecurse ( pfHash hash, keytype & k1, keytype & k2, hashtype & h1, h
 template < typename keytype, typename hashtype >
 bool DiffTest ( pfHash hash, int diffbits, int reps, bool dumpCollisions )
 {
-	const int keybits = sizeof(keytype) * 8;
-	const int hashbits = sizeof(hashtype) * 8;
+  const int keybits = sizeof(keytype) * 8;
+  const int hashbits = sizeof(hashtype) * 8;
 
-	double diffcount = chooseUpToK(keybits,diffbits);
-	double testcount = (diffcount * double(reps));
-	double expected  = testcount / pow(2.0,double(hashbits));
+  double diffcount = chooseUpToK(keybits,diffbits);
+  double testcount = (diffcount * double(reps));
+  double expected  = testcount / pow(2.0,double(hashbits));
 
-	std::vector<keytype> diffs;
+  std::vector<keytype> diffs;
 
-	keytype k1,k2;
-	hashtype h1,h2;
+  keytype k1,k2;
+  hashtype h1,h2;
 
-	printf("Testing %0.f up-to-%d-bit differentials in %d-bit keys -> %d bit hashes.\n",diffcount,diffbits,keybits,hashbits);
-	printf("%d reps, %0.f total tests, expecting %2.2f random collisions",reps,testcount,expected);
+  printf("Testing %0.f up-to-%d-bit differentials in %d-bit keys -> %d bit hashes.\n",diffcount,diffbits,keybits,hashbits);
+  printf("%d reps, %0.f total tests, expecting %2.2f random collisions",reps,testcount,expected);
 
-	for(int i = 0; i < reps; i++)
-	{
-		if(i % (reps/10) == 0) printf(".");
+  for(int i = 0; i < reps; i++)
+  {
+    if(i % (reps/10) == 0) printf(".");
 
-		rand_p(&k1,sizeof(k1));
-		k2 = k1;
+    rand_p(&k1,sizeof(k1));
+    k2 = k1;
 
-		hash(&k1,sizeof(k1),0,(uint32_t*)&h1);
+    hash(&k1,sizeof(k1),0,(uint32_t*)&h1);
 
-		DiffTestRecurse<keytype,hashtype>(hash,k1,k2,h1,h2,0,diffbits,diffs);
-	}
-	printf("\n");
+    DiffTestRecurse<keytype,hashtype>(hash,k1,k2,h1,h2,0,diffbits,diffs);
+  }
+  printf("\n");
 
-	bool result = true;
+  bool result = true;
 
-	result &= ProcessDifferentials(diffs,reps,dumpCollisions);
+  result &= ProcessDifferentials(diffs,reps,dumpCollisions);
 
-	return result;
+  return result;
 }
 
 //-----------------------------------------------------------------------------
@@ -185,53 +185,53 @@ bool DiffTest ( pfHash hash, int diffbits, int reps, bool dumpCollisions )
 template < typename keytype, typename hashtype >
 void DiffDistTest ( pfHash hash, const int diffbits, int trials, double & worst, double & avg )
 {
-	std::vector<keytype>  keys(trials);
-	std::vector<hashtype> A(trials),B(trials);
+  std::vector<keytype>  keys(trials);
+  std::vector<hashtype> A(trials),B(trials);
 
-	for(int i = 0; i < trials; i++)
-	{
-		rand_p(&keys[i],sizeof(keytype));
+  for(int i = 0; i < trials; i++)
+  {
+    rand_p(&keys[i],sizeof(keytype));
 
-		hash(&keys[i],sizeof(keytype),0,(uint32_t*)&A[i]);
-	}
+    hash(&keys[i],sizeof(keytype),0,(uint32_t*)&A[i]);
+  }
 
-	//----------
+  //----------
 
-	std::vector<keytype> diffs;
+  std::vector<keytype> diffs;
 
-	keytype temp(0);
+  keytype temp(0);
 
-	SparseKeygenRecurse<keytype>(0,diffbits,true,temp,diffs);
+  SparseKeygenRecurse<keytype>(0,diffbits,true,temp,diffs);
 
-	//----------
+  //----------
 
-	worst = 0;
-	avg = 0;
+  worst = 0;
+  avg = 0;
 
-	hashtype h2;
+  hashtype h2;
 
-	for(size_t j = 0; j < diffs.size(); j++)
-	{
-		keytype & d = diffs[j];
+  for(size_t j = 0; j < diffs.size(); j++)
+  {
+    keytype & d = diffs[j];
 
-		for(int i = 0; i < trials; i++)
-		{
-			keytype k2 = keys[i] ^ d;
+    for(int i = 0; i < trials; i++)
+    {
+      keytype k2 = keys[i] ^ d;
 
-			hash(&k2,sizeof(k2),0,&h2);
+      hash(&k2,sizeof(k2),0,&h2);
 
-			B[i] = A[i] ^ h2;
-		}
+      B[i] = A[i] ^ h2;
+    }
 
-		double dworst,davg;
+    double dworst,davg;
 
-		TestDistributionFast(B,dworst,davg);
+    TestDistributionFast(B,dworst,davg);
 
-		avg += davg;
-		worst = (dworst > worst) ? dworst : worst;
-	}
+    avg += davg;
+    worst = (dworst > worst) ? dworst : worst;
+  }
 
-	avg /= double(diffs.size());
+  avg /= double(diffs.size());
 }
 
 //----------------------------------------------------------------------------

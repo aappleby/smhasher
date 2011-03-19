@@ -3,29 +3,50 @@
 #include "Random.h"
 
 //-----------------------------------------------------------------------------
+// This should hopefully be a thorough and uambiguous test of whether a hash
+// is correctly implemented on a given platform
 
-void QuickBrownFox ( pfHash hash, const int hashbits )
+bool VerificationTest ( pfHash hash, const int hashbits, uint32_t expected, bool verbose )
 {
-	const int hashbytes = hashbits / 8;
+  const int hashbytes = hashbits / 8;
 
-	const char * text1 = "The quick brown fox jumps over the lazy dog";
-	const char * text2 = "The quick brown fox jumps over the lazy cog";
+  uint8_t * key    = new uint8_t[256];
+  uint8_t * hashes = new uint8_t[hashbytes * 256];
+  uint8_t * final  = new uint8_t[hashbytes];
 
-	uint8_t h1[128];
-	uint8_t h2[128];
+  memset(key,0,256);
+  memset(hashes,0,hashbytes*256);
+  memset(final,0,hashbytes);
 
-	hash(text1,(int)strlen(text1),0,h1);
-	hash(text2,(int)strlen(text2),0,h2);
+  for(int i = 0; i < 256; i++)
+  {
+    key[i] = (uint8_t)i;
+    
+    hash(key,i,0,&hashes[i*hashbytes]);
+  }
 
-	printf("\"%s\" => ",text1);
-	printhex32(h1,hashbytes);
-	printf("\n");
+  //----------
 
-	printf("\"%s\" => ",text2);
-	printhex32(h2,hashbytes);
-	printf("\n");
+  hash(hashes,hashbytes*256,0,final);
 
-	printf("\n");
+  uint32_t verification = (final[0] << 0) | (final[1] << 8) | (final[2] << 16) | (final[3] << 24);
+
+  delete [] key;
+  delete [] hashes;
+  delete [] final;
+
+  //----------
+
+  if(expected != verification)
+  {
+    if(verbose) printf("Verification value 0x%08X : Failed! (Expected 0x%08x)\n",verification,expected);
+    return false;
+  }
+  else
+  {
+    if(verbose) printf("Verification value 0x%08X : Passed!\n",verification);
+    return true;
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -41,81 +62,82 @@ void QuickBrownFox ( pfHash hash, const int hashbits )
 // The memory alignment of the key should not affect the hash result.
 
 bool SanityTest ( pfHash hash, const int hashbits )
-{	printf("Testing bit twiddling");
+{
+  printf("Running sanity check 1");
 
-	bool result = true;
+  bool result = true;
 
-	const int hashbytes = hashbits/8;
-	const int reps = 10;
-	const int keymax = 128;
-	const int pad = 16;
-	const int buflen = keymax + pad*3;
-	
-	uint8_t * buffer1 = new uint8_t[buflen];
-	uint8_t * buffer2 = new uint8_t[buflen];
+  const int hashbytes = hashbits/8;
+  const int reps = 10;
+  const int keymax = 128;
+  const int pad = 16;
+  const int buflen = keymax + pad*3;
+  
+  uint8_t * buffer1 = new uint8_t[buflen];
+  uint8_t * buffer2 = new uint8_t[buflen];
 
-	uint8_t * hash1 = new uint8_t[hashbytes];
-	uint8_t * hash2 = new uint8_t[hashbytes];
+  uint8_t * hash1 = new uint8_t[hashbytes];
+  uint8_t * hash2 = new uint8_t[hashbytes];
 
-	//----------
-	
-	for(int irep = 0; irep < reps; irep++)
-	{
-		if(irep % (reps/10) == 0) printf(".");
+  //----------
+  
+  for(int irep = 0; irep < reps; irep++)
+  {
+    if(irep % (reps/10) == 0) printf(".");
 
-		for(int len = 4; len <= keymax; len++)
-		{
-			for(int offset = pad; offset < pad*2; offset++)
-			{
-				uint8_t * key1 = &buffer1[pad];
-				uint8_t * key2 = &buffer2[pad+offset];
+    for(int len = 4; len <= keymax; len++)
+    {
+      for(int offset = pad; offset < pad*2; offset++)
+      {
+        uint8_t * key1 = &buffer1[pad];
+        uint8_t * key2 = &buffer2[pad+offset];
 
-				rand_p(buffer1,buflen);
-				rand_p(buffer2,buflen);
+        rand_p(buffer1,buflen);
+        rand_p(buffer2,buflen);
 
-				memcpy(key2,key1,len);
+        memcpy(key2,key1,len);
 
-				hash(key1,len,0,hash1);
+        hash(key1,len,0,hash1);
 
-				for(int bit = 0; bit < (len * 8); bit++)
-				{
-					// Flip a bit, hash the key -> we should get a different result.
+        for(int bit = 0; bit < (len * 8); bit++)
+        {
+          // Flip a bit, hash the key -> we should get a different result.
 
-					flipbit(key2,len,bit);
-					hash(key2,len,0,hash2);
+          flipbit(key2,len,bit);
+          hash(key2,len,0,hash2);
 
-					if(memcmp(hash1,hash2,hashbytes) == 0)
-					{
-						result = false;
-					}
+          if(memcmp(hash1,hash2,hashbytes) == 0)
+          {
+            result = false;
+          }
 
-					// Flip it back, hash again -> we should get the original result.
+          // Flip it back, hash again -> we should get the original result.
 
-					flipbit(key2,len,bit);
-					hash(key2,len,0,hash2);
+          flipbit(key2,len,bit);
+          hash(key2,len,0,hash2);
 
-					if(memcmp(hash1,hash2,hashbytes) != 0)
-					{
-						result = false;
-					}
-				}
-			}
-		}
-	}
+          if(memcmp(hash1,hash2,hashbytes) != 0)
+          {
+            result = false;
+          }
+        }
+      }
+    }
+  }
 
-	if(result == false)
-	{
-		printf("*********FAIL*********\n");
-	}
-	else
-	{
-		printf("PASS\n");
-	}
+  if(result == false)
+  {
+    printf("*********FAIL*********\n");
+  }
+  else
+  {
+    printf("PASS\n");
+  }
 
-	delete [] hash1;
-	delete [] hash2;
+  delete [] hash1;
+  delete [] hash2;
 
-	return result;
+  return result;
 }
 
 //----------------------------------------------------------------------------
@@ -124,41 +146,41 @@ bool SanityTest ( pfHash hash, const int hashbits )
 
 void AppendedZeroesTest ( pfHash hash, const int hashbits )
 {
-	const int hashbytes = hashbits/8;
+  printf("Running sanity check 2");
 
-	printf("Testing zero-appending");
+  const int hashbytes = hashbits/8;
 
-	for(int rep = 0; rep < 100; rep++)
-	{
-		if(rep % 10 == 0) printf(".");
+  for(int rep = 0; rep < 100; rep++)
+  {
+    if(rep % 10 == 0) printf(".");
 
-		unsigned char key[256];
+    unsigned char key[256];
 
-		memset(key,0,sizeof(key));
+    memset(key,0,sizeof(key));
 
-		rand_p(key,32);
+    rand_p(key,32);
 
-		uint32_t h1[16];
-		uint32_t h2[16];
+    uint32_t h1[16];
+    uint32_t h2[16];
 
-		memset(h1,0,hashbytes);
-		memset(h2,0,hashbytes);
+    memset(h1,0,hashbytes);
+    memset(h2,0,hashbytes);
 
-		for(int i = 0; i < 32; i++)
-		{
-			hash(key,32+i,0,h1);
+    for(int i = 0; i < 32; i++)
+    {
+      hash(key,32+i,0,h1);
 
-			if(memcmp(h1,h2,hashbytes) == 0)
-			{
-				printf("\n*********FAIL*********\n");
-				return;
-			}
+      if(memcmp(h1,h2,hashbytes) == 0)
+      {
+        printf("\n*********FAIL*********\n");
+        return;
+      }
 
-			memcpy(h2,h1,hashbytes);
-		}
-	}
+      memcpy(h2,h1,hashbytes);
+    }
+  }
 
-	printf("PASS\n");
+  printf("PASS\n");
 }
 
 //-----------------------------------------------------------------------------
