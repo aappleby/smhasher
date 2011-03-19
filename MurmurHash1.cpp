@@ -79,7 +79,7 @@ unsigned int MurmurHash1Aligned ( const void * key, int len, unsigned int seed )
 
 	unsigned int h = seed ^ (len * m);
 
-	int align = (int)data & 3;
+	int align = (uint64_t)data & 3;
 
 	if(align && (len >= 4))
 	{
