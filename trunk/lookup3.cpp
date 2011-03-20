@@ -1,6 +1,6 @@
 // lookup3 by Bob Jekins, code is public domain.
 
-#include "pstdint.h"
+#include "Platform.h"
 
 #define rot(x,k) (((x)<<(k)) | ((x)>>(32-(k))))
 
