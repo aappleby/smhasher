@@ -37,8 +37,11 @@ void BulkSpeedTest ( pfHash hash )
       blackhole(temp[0]);
 
       double cycles = double(end-begin);
-      double bpc = double(blocksize) / cycles;
-      if(bpc > bestbpc) bestbpc = bpc;
+      if(cycles > 0)
+      {
+        double bpc = double(blocksize) / cycles;
+        if(bpc > bestbpc) bestbpc = bpc;
+      }
     }
 
     double bestbps = (bestbpc * 3000000000.0 / 1048576.0);
@@ -94,7 +97,7 @@ void TinySpeedTest ( pfHash hash, int hashsize, int keysize, bool verbose, doubl
     //blackhole(*(uint32_t*)(&h));
 
     double cycles = double(end-begin) / 64;
-    if(cycles < bestcycles) bestcycles = cycles;
+    if((cycles > 0) && (cycles < bestcycles)) bestcycles = cycles;
   }
 
   double bestbpc = double(keysize) / bestcycles;
