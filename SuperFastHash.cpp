@@ -1,4 +1,4 @@
-#include "pstdint.h"
+#include "Platform.h"
 
 /* By Paul Hsieh (C) 2004, 2005.  Covered under the Paul Hsieh derivative 
    license. See: 
