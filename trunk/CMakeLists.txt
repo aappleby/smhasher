@@ -21,7 +21,6 @@ add_library(
   MurmurHashAligned2.cpp
   MurmurHashAligned.cpp
   MurmurHashNeutral2.cpp
-  MurmurHashTest.cpp
   Platform.cpp
   Random.cpp
   sha1.cpp
