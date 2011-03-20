@@ -1,4 +1,5 @@
 #include "Platform.h"
+#include <stdio.h> // for NULL
 
 /* By Paul Hsieh (C) 2004, 2005.  Covered under the Paul Hsieh derivative 
    license. See: 
