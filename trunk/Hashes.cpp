@@ -63,11 +63,11 @@ void DoNothingHash ( const void *, int, uint32_t, void * )
 //-----------------------------------------------------------------------------
 // One-byte-at-a-time hash based on Murmur's mix
 
-void MurmurOAAT ( const void * key, int len, uint32_t seed, void * out )
+uint32_t MurmurOAAT ( const void * key, int len, uint32_t seed )
 {
   const uint8_t * data = (const uint8_t*)key;
 
-  uint32_t h = seed ^ len;
+  uint32_t h = seed;
 
   for(int i = 0; i < len; i++)
   {
@@ -76,10 +76,12 @@ void MurmurOAAT ( const void * key, int len, uint32_t seed, void * out )
     h ^= h >> 15;
   }
 
-  h *= 0x5bd1e995;
-  h ^= h >> 15;
+  return h;
+}
 
-  *(uint32_t*)out = h;
+void MurmurOAAT_test ( const void * key, int len, uint32_t seed, void * out )
+{
+	*(uint32_t*)out = MurmurOAAT(key,len,seed);
 }
 
 //----------------------------------------------------------------------------

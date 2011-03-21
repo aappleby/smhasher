@@ -7,6 +7,7 @@
 #include "Types.h"
 #include "Stats.h"      // for chooseUpToK
 #include "KeysetTest.h" // for SparseKeygenRecurse
+#include "Random.h"
 
 #include <vector>
 #include <algorithm>
@@ -138,6 +139,8 @@ bool DiffTest ( pfHash hash, int diffbits, int reps, bool dumpCollisions )
   double testcount = (diffcount * double(reps));
   double expected  = testcount / pow(2.0,double(hashbits));
 
+  Rand r(100);
+
   std::vector<keytype> diffs;
 
   keytype k1,k2;
@@ -150,7 +153,7 @@ bool DiffTest ( pfHash hash, int diffbits, int reps, bool dumpCollisions )
   {
     if(i % (reps/10) == 0) printf(".");
 
-    rand_p(&k1,sizeof(k1));
+    r.rand_p(&k1,sizeof(keytype));
     k2 = k1;
 
     hash(&k1,sizeof(k1),0,(uint32_t*)&h1);
