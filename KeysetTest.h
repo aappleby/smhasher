@@ -248,6 +248,8 @@ bool CyclicKeyTest ( pfHash hash, int cycleLen, int cycleReps, const int keycoun
 {
   printf("Keyset 'Cyclic' - %d cycles of %d bytes - %d keys\n",cycleReps,cycleLen,keycount);
 
+  Rand r(483723);
+
   std::vector<hashtype> hashes;
   hashes.resize(keycount);
 
@@ -260,7 +262,7 @@ bool CyclicKeyTest ( pfHash hash, int cycleLen, int cycleReps, const int keycoun
 
   for(int i = 0; i < keycount; i++)
   {
-    rand_p(cycle,cycleLen);
+    r.rand_p(cycle,cycleLen);
 
     *(uint32_t*)cycle = f3mix(i ^ 0x746a94f1);
 
