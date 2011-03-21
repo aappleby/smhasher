@@ -51,7 +51,7 @@ HashInfo g_hashes[] =
   { FNV,                  32, 0x2B377407, "FNV",         "Fowler-Noll-Vo hash, 32-bit" },
   { lookup3_test,         32, 0xDEC6FD2F, "lookup3",     "Bob Jenkins' lookup3" },
   { SuperFastHash,        32, 0x980ACD1D, "superfast",   "Paul Hsieh's SuperFastHash" },
-  { MurmurOAAT,           32, 0x5F424541, "MurmurOAAT",  "Murmur one-at-a-time" },
+  { MurmurOAAT_test,      32, 0xF5AC8D0D, "MurmurOAAT",  "Murmur one-at-a-time" },
   
   // MurmurHash2
 
@@ -468,11 +468,11 @@ int main ( int argc, char ** argv )
 
   int timeBegin = clock();
 
-  g_testAll = true;
+  g_testAll = false;
 
   //g_testSanity = true;
   //g_testSpeed = true;
-  //g_testAvalanche = true;
+  g_testAvalanche = true;
   //g_testCyclic = true;
   //g_testDiff = true;
   //g_testSparse = true;
@@ -486,7 +486,7 @@ int main ( int argc, char ** argv )
   int timeEnd = clock();
 
   printf("\n");
-  printf("Testing took %f seconds\n",double(timeEnd-timeBegin)/double(CLOCKS_PER_SEC));
+  printf("Verification value is 0x%08x - Testing took %f seconds\n",g_verify,double(timeEnd-timeBegin)/double(CLOCKS_PER_SEC));
   printf("-------------------------------------------------------------------------------\n");
   return 0;
 }

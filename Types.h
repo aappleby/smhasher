@@ -14,6 +14,19 @@ void     blackhole ( uint32_t x );
 uint32_t whitehole ( void );
 
 //-----------------------------------------------------------------------------
+// We want to verify that every test produces the same result on every platform
+// To do this, we hash the results of every test to produce an overall
+// verification value for the whole test suite. If two runs produce the same
+// verification value, then every test in both run produced the same results
+
+extern uint32_t g_verify;
+
+// Mix the given blob of data into the verification code
+
+void MixVCode ( const void * blob, int len );
+
+
+//-----------------------------------------------------------------------------
 
 typedef void (*pfHash) ( const void * blob, const int len, const uint32_t seed, void * out );
 
