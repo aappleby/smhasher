@@ -2,13 +2,16 @@
 
 #include "Random.h"
 
-#include <stdio.h>  // for printf
+#include <stdio.h>   // for printf
+#include <memory.h>  // for memset
 
 //-----------------------------------------------------------------------------
 // 256k blocks seem to give the best results.
 
-void BulkSpeedTest ( pfHash hash )
+void BulkSpeedTest ( pfHash hash, uint32_t seed )
 {
+  Rand r(seed);
+  
   const int trials = 9999;
   const int blocksize = 256 * 1024;
 
@@ -16,7 +19,7 @@ void BulkSpeedTest ( pfHash hash )
 
   char * block = new char[blocksize + 16];
 
-  rand_p(block,blocksize+16);
+  r.rand_p(block,blocksize+16);
 
   uint32_t temp[16];
 
@@ -53,23 +56,30 @@ void BulkSpeedTest ( pfHash hash )
 
 //-----------------------------------------------------------------------------
 
-void TinySpeedTest ( pfHash hash, int hashsize, int keysize, bool verbose, double & outCycles )
+void TinySpeedTest ( pfHash hash, int hashsize, int keysize, uint32_t seed, bool verbose, double & outCycles )
 {
   const int trials = 100000;
 
   if(verbose) printf("Small key speed test - %4d-byte keys - ",keysize);
+  
+  Rand r(seed);
 
   uint8_t * h = new uint8_t[hashsize];
   uint8_t * k = new uint8_t[keysize];
+  
+  memset(h,0,hashsize);
+  memset(k,0,keysize);
 
   double bestcycles = 1e9;
 
   for(int itrial = 0; itrial < trials; itrial++)
   {
-    int64_t begin,end;
+    volatile int64_t begin,end;
 
     rand_p(k,keysize);
 
+    MixVCode(h,4);
+    
     begin = rdtsc();
     
     hash(k,keysize,itrial,h);   hash(k,keysize,itrial,h);   hash(k,keysize,itrial,h);   hash(k,keysize,itrial,h);
@@ -94,7 +104,8 @@ void TinySpeedTest ( pfHash hash, int hashsize, int keysize, bool verbose, doubl
 
     end = rdtsc();
 
-    //blackhole(*(uint32_t*)(&h));
+    MixVCode(h,4);
+    //printf("0x%08x\n",g_verify);
 
     double cycles = double(end-begin) / 64;
     if((cycles > 0) && (cycles < bestcycles)) bestcycles = cycles;

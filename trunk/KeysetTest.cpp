@@ -64,6 +64,8 @@ bool VerificationTest ( pfHash hash, const int hashbits, uint32_t expected, bool
 bool SanityTest ( pfHash hash, const int hashbits )
 {
   printf("Running sanity check 1");
+  
+  Rand r(883741);
 
   bool result = true;
 
@@ -92,8 +94,8 @@ bool SanityTest ( pfHash hash, const int hashbits )
         uint8_t * key1 = &buffer1[pad];
         uint8_t * key2 = &buffer2[pad+offset];
 
-        rand_p(buffer1,buflen);
-        rand_p(buffer2,buflen);
+        r.rand_p(buffer1,buflen);
+        r.rand_p(buffer2,buflen);
 
         memcpy(key2,key1,len);
 
@@ -147,6 +149,8 @@ bool SanityTest ( pfHash hash, const int hashbits )
 void AppendedZeroesTest ( pfHash hash, const int hashbits )
 {
   printf("Running sanity check 2");
+  
+  Rand r(173994);
 
   const int hashbytes = hashbits/8;
 
@@ -158,7 +162,7 @@ void AppendedZeroesTest ( pfHash hash, const int hashbits )
 
     memset(key,0,sizeof(key));
 
-    rand_p(key,32);
+    r.rand_p(key,32);
 
     uint32_t h1[16];
     uint32_t h2[16];

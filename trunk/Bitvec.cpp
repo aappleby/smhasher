@@ -594,6 +594,8 @@ uint32_t window32 ( void * blob, int len, int start, int count )
 
 bool test_shift ( void )
 {
+  Rand r(1123);
+
   int nbits   = 64;
   int nbytes  = nbits / 8;
   int reps = 10000;
@@ -602,7 +604,7 @@ bool test_shift ( void )
   {
     if(j % (reps/10) == 0) printf(".");
 
-    uint64_t a = rand_u64();
+    uint64_t a = r.rand_u64();
     uint64_t b;
 
     for(int i = 0; i < nbits; i++)
@@ -634,6 +636,8 @@ bool test_shift ( void )
 template < int nbits >
 bool test_window2 ( void )
 {
+  Rand r(83874);
+  
   struct keytype
   {
     uint8_t bytes[nbits/8];
@@ -648,7 +652,7 @@ bool test_window2 ( void )
 
     keytype k;
 
-    rand_p(&k,nbytes);
+    r.rand_p(&k,nbytes);
 
     for(int start = 0; start < nbits; start++)
     {
@@ -671,6 +675,8 @@ bool test_window2 ( void )
 
 bool test_window ( void )
 {
+  Rand r(48402);
+  
   int reps = 10000;
 
   for(int j = 0; j < reps; j++)
@@ -680,7 +686,7 @@ bool test_window ( void )
     int nbits   = 64;
     int nbytes  = nbits / 8;
 
-    uint64_t x = rand_u64();
+    uint64_t x = r.rand_u64();
 
     for(int start = 0; start < nbits; start++)
     {

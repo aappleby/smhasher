@@ -137,14 +137,14 @@ void test ( hashfunc<hashtype> hash, HashInfo * info )
   {
     printf("[[[ Speed Tests ]]]\n\n");
 
-    BulkSpeedTest(hash);
+    BulkSpeedTest(info->hash,info->verification);
     printf("\n");
 
     for(int i = 1; i < 32; i++)
     {
       double cycles;
 
-      TinySpeedTest(hash,sizeof(hashtype),i,true,cycles);
+      TinySpeedTest(hashfunc<hashtype>(info->hash),sizeof(hashtype),i,info->verification,true,cycles);
     }
 
     printf("\n");
@@ -425,10 +425,28 @@ void test ( hashfunc<hashtype> hash, HashInfo * info )
 
 //-----------------------------------------------------------------------------
 
+uint32_t g_inputVCode = 1;
+uint32_t g_outputVCode = 1;
+uint32_t g_resultVCode = 1;
+
+HashInfo * g_hashUnderTest = NULL;
+
+void VerifyHash ( const void * key, int len, uint32_t seed, void * out )
+{
+  g_inputVCode = MurmurOAAT(key,len,g_inputVCode);
+  g_inputVCode = MurmurOAAT(&seed,sizeof(uint32_t),g_inputVCode);
+  
+  g_hashUnderTest->hash(key,len,seed,out);
+  
+  g_outputVCode = MurmurOAAT(out,g_hashUnderTest->hashbits/8,g_outputVCode);
+}
+
+//-----------------------------------------------------------------------------
+
 void testHash ( const char * name )
 {
   HashInfo * pInfo = findHash(name);
-
+  
   if(pInfo == NULL)
   {
     printf("Invalid hash '%s' specified\n",name);
@@ -436,9 +454,11 @@ void testHash ( const char * name )
   }
   else
   {
+    g_hashUnderTest = pInfo;
+
     if(pInfo->hashbits == 32)
     {
-      test<uint32_t>( pInfo->hash, pInfo );
+      test<uint32_t>( VerifyHash, pInfo );
     }
     else if(pInfo->hashbits == 64)
     {
@@ -462,6 +482,12 @@ void testHash ( const char * name )
 
 int main ( int argc, char ** argv )
 {
+  if(argc < 2)
+  {
+    printf("Bad args\n");
+    exit(1);
+  }
+  
   SetAffinity(2);
 
   SelfTest();
@@ -470,22 +496,23 @@ int main ( int argc, char ** argv )
 
   g_testAll = false;
 
-  //g_testSanity = true;
-  //g_testSpeed = true;
-  g_testAvalanche = true;
+  g_testSanity = true;
+  g_testSpeed = true;
+  //g_testAvalanche = true;
   //g_testCyclic = true;
   //g_testDiff = true;
   //g_testSparse = true;
   //g_testPermutation = true;
   //g_testZeroes = true;
 
-  testHash("murmur3a");
+  testHash(argv[1]);
 
   //----------
 
   int timeEnd = clock();
 
   printf("\n");
+  printf("Input vcode 0x%08x, Output vcode 0x%08x, Result vcode 0x%08x\n",g_inputVCode,g_outputVCode,g_resultVCode);
   printf("Verification value is 0x%08x - Testing took %f seconds\n",g_verify,double(timeEnd-timeBegin)/double(CLOCKS_PER_SEC));
   printf("-------------------------------------------------------------------------------\n");
   return 0;

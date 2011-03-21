@@ -25,7 +25,7 @@ double maxBias ( std::vector<int> & counts, int reps );
 //-----------------------------------------------------------------------------
 
 template < typename keytype, typename hashtype >
-void calcBias ( pfHash hash, std::vector<int> & counts, int reps )
+void calcBias ( pfHash hash, std::vector<int> & counts, int reps, Rand & r )
 {
   const int keybytes = sizeof(keytype);
   const int hashbytes = sizeof(hashtype);
@@ -40,7 +40,7 @@ void calcBias ( pfHash hash, std::vector<int> & counts, int reps )
   {
     if(irep % (reps/10) == 0) printf(".");
 
-    rand_p(&K,keybytes);
+    r.rand_p(&K,keybytes);
 
     hash(&K,keybytes,0,&A);
 
@@ -68,6 +68,8 @@ void calcBias ( pfHash hash, std::vector<int> & counts, int reps )
 template < typename keytype, typename hashtype >
 bool AvalancheTest ( pfHash hash, const int reps )
 {
+  Rand r(48273);
+  
   const int keybytes = sizeof(keytype);
   const int hashbytes = sizeof(hashtype);
 
@@ -80,7 +82,7 @@ bool AvalancheTest ( pfHash hash, const int reps )
 
   std::vector<int> bins(keybits*hashbits,0);
 
-  calcBias<keytype,hashtype>(hash,bins,reps);
+  calcBias<keytype,hashtype>(hash,bins,reps,r);
   
   //----------
 
@@ -108,6 +110,8 @@ bool AvalancheTest ( pfHash hash, const int reps )
 template< typename keytype, typename hashtype >
 void BicTest ( pfHash hash, const int keybit, const int reps, double & maxBias, int & maxA, int & maxB, bool verbose )
 {
+  Rand r(11938);
+  
   const int keybytes = sizeof(keytype);
   const int hashbytes = sizeof(hashtype);
   const int hashbits = hashbytes * 8;
@@ -124,7 +128,7 @@ void BicTest ( pfHash hash, const int keybit, const int reps, double & maxBias, 
       if(irep % (reps/10) == 0) printf(".");
     }
 
-    rand_p(&key,keybytes);
+    r.rand_p(&key,keybytes);
     hash(&key,keybytes,0,&h1);
 
     flipbit(key,keybit);
