@@ -96,9 +96,7 @@ MurmurHash2_x86_64   - 3352 mb/sec (2)
 MurmurHash2_x64_64   - 2857 mb/sec
 
 MurmurHash3_x86_32   - 3105 mb/sec 
-MurmurHash3_x86_64   - 2899 mb/sec 
 MurmurHash3_x86_128  - 2684 mb/sec
-
 MurmurHash3_x64_128  - 5058 mb/sec (3)
 }}}
 
