@@ -237,4 +237,45 @@ void DiffDistTest ( pfHash hash, const int diffbits, int trials, double & worst,
   avg /= double(diffs.size());
 }
 
+//-----------------------------------------------------------------------------
+// Simpler differential-distribution test - for all 1-bit differentials,
+// generate random key pairs and run full distribution/collision tests on the
+// hash differentials
+
+template < typename keytype, typename hashtype >
+bool DiffDistTest2 ( pfHash hash  )
+{
+  Rand r(857374);
+
+  int keybits = sizeof(keytype) * 8;
+  const int keycount = 256*256*32;
+  keytype k;
+  
+  std::vector<hashtype> hashes(keycount);
+  hashtype h1,h2;
+
+  bool result = true;
+
+  for(int keybit = 0; keybit < keybits; keybit++)
+  {
+    printf("Testing bit %d\n",keybit);
+
+    for(int i = 0; i < keycount; i++)
+    {
+      r.rand_p(&k,sizeof(keytype));
+      
+      hash(&k,sizeof(keytype),0,&h1);
+      flipbit(&k,sizeof(keytype),keybit);
+      hash(&k,sizeof(keytype),0,&h2);
+
+      hashes[i] = h1 ^ h2;
+    }
+
+    result &= TestHashList<hashtype>(hashes,true,true,true);
+    printf("\n");
+  }
+
+  return result;
+}
+
 //----------------------------------------------------------------------------

@@ -16,7 +16,9 @@ bool g_testAll = false;
 bool g_testSanity      = false;
 bool g_testSpeed       = false;
 bool g_testDiff        = false;
+bool g_testDiffDist    = false;
 bool g_testAvalanche   = false;
+bool g_testBIC         = false;
 bool g_testCyclic      = false;
 bool g_testSparse      = false;
 bool g_testPermutation = false;
@@ -43,28 +45,29 @@ HashInfo g_hashes[] =
   { DoNothingHash,        64, 0x00000000, "donothing64", "Do-Nothing function (only valid for measuring call overhead)" },
   { DoNothingHash,       128, 0x00000000, "donothing128", "Do-Nothing function (only valid for measuring call overhead)" },
 
-  { crc32,                32, 0x5C7DDD1F, "crc32",       "CRC-32" },
+  { crc32,                32, 0x3719DB20, "crc32",       "CRC-32" },
 
   { md5_32,               32, 0xC10C356B, "md5_32a",     "MD5, first 32 bits of result" },
   { sha1_32a,             32, 0xF9376EA7, "sha1_32a",    "SHA1, first 32 bits of result" },
 
-  { FNV,                  32, 0x2B377407, "FNV",         "Fowler-Noll-Vo hash, 32-bit" },
-  { lookup3_test,         32, 0xDEC6FD2F, "lookup3",     "Bob Jenkins' lookup3" },
+  { FNV,                  32, 0xE3CBBE91, "FNV",         "Fowler-Noll-Vo hash, 32-bit" },
+  { lookup3_test,         32, 0x3D83917A, "lookup3",     "Bob Jenkins' lookup3" },
   { SuperFastHash,        32, 0x980ACD1D, "superfast",   "Paul Hsieh's SuperFastHash" },
-  { MurmurOAAT_test,      32, 0xF5AC8D0D, "MurmurOAAT",  "Murmur one-at-a-time" },
+  { MurmurOAAT_test,      32, 0x5363BD98, "MurmurOAAT",  "Murmur one-at-a-time" },
+  { Crap8_test,           32, 0x743E97A1, "Crap8",       "Crap8" },
   
   // MurmurHash2
 
-  { MurmurHash2_test,     32, 0xA6D95DE6, "Murmur2",     "MurmurHash2 for x86, 32-bit" },
-  { MurmurHash2A_test,    32, 0xB79DC030, "Murmur2A",    "MurmurHash2A for x86, 32-bit" },
-  { MurmurHash64A_test,   64, 0xDBD7FF4B, "Murmur2B",    "MurmurHash2 for x64, 64-bit" },
-  { MurmurHash64B_test,   64, 0x3B861F71, "Murmur2C",    "MurmurHash2 for x86, 64-bit" },
+  { MurmurHash2_test,     32, 0x27864C1E, "Murmur2",     "MurmurHash2 for x86, 32-bit" },
+  { MurmurHash2A_test,    32, 0x7FBD4396, "Murmur2A",    "MurmurHash2A for x86, 32-bit" },
+  { MurmurHash64A_test,   64, 0x1F0D3804, "Murmur2B",    "MurmurHash2 for x64, 64-bit" },
+  { MurmurHash64B_test,   64, 0xDD537C05, "Murmur2C",    "MurmurHash2 for x86, 64-bit" },
 
   // MurmurHash3
 
-  { MurmurHash3_x86_32,   32, 0x3B75AFFD, "Murmur3A",    "MurmurHash3 for x86, 32-bit" },
-  { MurmurHash3_x86_128, 128, 0x78C7F0DB, "Murmur3C",    "MurmurHash3 for x86, 128-bit" },
-  { MurmurHash3_x64_128, 128, 0x54667393, "Murmur3F",    "MurmurHash3 for x64, 128-bit" },
+  { MurmurHash3_x86_32,   32, 0xEA5DFD02, "Murmur3A",    "MurmurHash3 for x86, 32-bit" },
+  { MurmurHash3_x86_128, 128, 0x411C981B, "Murmur3C",    "MurmurHash3 for x86, 128-bit" },
+  { MurmurHash3_x64_128, 128, 0x04D005BA, "Murmur3F",    "MurmurHash3 for x64, 128-bit" },
 
 };
 
@@ -169,6 +172,20 @@ void test ( hashfunc<hashtype> hash, HashInfo * info )
   }
 
   //-----------------------------------------------------------------------------
+  // Differential-distribution tests
+
+  if(g_testDiffDist /*|| g_testAll*/)
+  {
+    printf("[[[ Differential Distribution Tests ]]]\n\n");
+
+    bool result = true;
+
+    result &= DiffDistTest2<uint64_t,hashtype>(hash);
+
+    printf("\n");
+  }
+
+  //-----------------------------------------------------------------------------
   // Avalanche tests
   
   if(g_testAvalanche || g_testAll)
@@ -196,6 +213,22 @@ void test ( hashfunc<hashtype> hash, HashInfo * info )
     result &= AvalancheTest< Blob<136>, hashtype > (hash,300000);
     result &= AvalancheTest< Blob<144>, hashtype > (hash,300000);
     result &= AvalancheTest< Blob<152>, hashtype > (hash,300000);
+
+    if(!result) printf("*********FAIL*********\n");
+    printf("\n");
+  }
+
+  //-----------------------------------------------------------------------------
+  // Bit Independence Criteria
+
+  if(g_testBIC /*|| g_testAll*/)
+  {
+    printf("[[[ Bit Independence Criteria ]]]\n\n");
+
+    bool result = true;
+
+    //result &= BicTest<uint64_t,hashtype>(hash,2000000);
+    BicTest3<Blob<88>,hashtype>(hash,2000000);
 
     if(!result) printf("*********FAIL*********\n");
     printf("\n");
@@ -482,10 +515,15 @@ void testHash ( const char * name )
 
 int main ( int argc, char ** argv )
 {
+  const char * hashToTest = "murmur3a";
+
   if(argc < 2)
   {
-    printf("Bad args\n");
-    exit(1);
+    printf("(No test hash given on command line, testing Murmur3_x86_32.)\n");
+  }
+  else
+  {
+    hashToTest = argv[1];
   }
   
   SetAffinity(2);
@@ -494,18 +532,20 @@ int main ( int argc, char ** argv )
 
   int timeBegin = clock();
 
-  g_testAll = false;
+  g_testAll = true;
 
-  g_testSanity = true;
-  g_testSpeed = true;
+  //g_testSanity = true;
+  //g_testSpeed = true;
   //g_testAvalanche = true;
+  //g_testBIC = true;
   //g_testCyclic = true;
   //g_testDiff = true;
+  //g_testDiffDist = true;
   //g_testSparse = true;
   //g_testPermutation = true;
   //g_testZeroes = true;
 
-  testHash(argv[1]);
+  testHash(hashToTest);
 
   //----------
 
