@@ -20,6 +20,7 @@ bool g_testDiffDist    = false;
 bool g_testAvalanche   = false;
 bool g_testBIC         = false;
 bool g_testCyclic      = false;
+bool g_testTwoBytes    = false;
 bool g_testSparse      = false;
 bool g_testPermutation = false;
 bool g_testWindow      = false;
@@ -250,6 +251,22 @@ void test ( hashfunc<hashtype> hash, HashInfo * info )
     result &= CyclicKeyTest<hashtype>(hash,sizeof(hashtype)+3,8,10000000,drawDiagram);
     result &= CyclicKeyTest<hashtype>(hash,sizeof(hashtype)+4,8,10000000,drawDiagram);
     
+    if(!result) printf("*********FAIL*********\n");
+    printf("\n");
+  }
+
+  //-----------------------------------------------------------------------------
+  // Keyset 'TwoBytes'
+
+  if(g_testTwoBytes)
+  {
+    printf("[[[ Keyset 'TwoBytes' Tests ]]]\n\n");
+
+    bool result = true;
+    bool drawDiagram = false;
+
+    result &= TwoBytesTest<hashtype>(hash,24,drawDiagram);
+
     if(!result) printf("*********FAIL*********\n");
     printf("\n");
   }
@@ -539,6 +556,7 @@ int main ( int argc, char ** argv )
   //g_testAvalanche = true;
   //g_testBIC = true;
   //g_testCyclic = true;
+  //g_testTwoBytes = true;
   //g_testDiff = true;
   //g_testDiffDist = true;
   //g_testSparse = true;
@@ -546,6 +564,17 @@ int main ( int argc, char ** argv )
   //g_testZeroes = true;
 
   testHash(hashToTest);
+
+  /*
+  for(int i = 0; i < sizeof(g_hashes)/sizeof(HashInfo); i++)
+  {
+    testHash(g_hashes[i].name);
+  }
+  */
+
+  //testHash("murmur3a");
+  //testHash("murmur3c");
+  //testHash("murmur3f");
 
   //----------
 

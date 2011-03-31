@@ -37,16 +37,15 @@ inline uint32_t f3mix ( uint32_t k )
 //-----------------------------------------------------------------------------
 
 template< typename hashtype >
-int CountCollisions ( std::vector<hashtype> const & hashes )
+int CountCollisions ( std::vector<hashtype> & hashes )
 {
   int collcount = 0;
 
-  std::vector<hashtype> temp = hashes;
-  std::sort(temp.begin(),temp.end());
+  std::sort(hashes.begin(),hashes.end());
 
   for(size_t i = 1; i < hashes.size(); i++)
   {
-    if(temp[i] == temp[i-1]) collcount++;
+    if(hashes[i] == hashes[i-1]) collcount++;
   }
 
   return collcount;

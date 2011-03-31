@@ -102,6 +102,12 @@ public:
     return *this;
   }
 
+  Blob ( uint64_t a, uint64_t b )
+  {
+    uint64_t t[2] = {a,b};
+    set(&t,16);
+  }
+
   void set ( const void * blob, int len )
   {
     const uint8_t * k = (const uint8_t*)blob;
