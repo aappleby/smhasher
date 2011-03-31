@@ -12,6 +12,7 @@
 #include "Random.h"   // for rand_p
 
 #include <algorithm>  // for std::swap
+#include <assert.h>
 
 //-----------------------------------------------------------------------------
 // Sanity tests
@@ -283,6 +284,85 @@ bool CyclicKeyTest ( pfHash hash, int cycleLen, int cycleReps, const int keycoun
 
   delete [] cycle;
   delete [] key;
+
+  return result;
+}
+
+//-----------------------------------------------------------------------------
+// Keyset 'TwoBytes' - generate all keys up to length N with two non-zero bytes
+
+template < typename hashtype >
+bool TwoBytesTest ( pfHash hash, int maxlen, bool drawDiagram )
+{
+  int keycount = 0;
+
+  for(int i = 2; i <= maxlen; i++) keycount += (int)chooseK(i,2);
+
+  keycount *= 255*255;
+
+  for(int i = 2; i <= maxlen; i++) keycount += i*255;
+
+  printf("Keyset 'TwoBytes' - %d keys of up to %d bytes\n",keycount,maxlen);
+
+  std::vector<hashtype> hashes;
+  hashes.resize(keycount);
+  int cursor = 0;
+
+  uint8_t key[256];
+
+  memset(key,0,256);
+
+  //----------
+  // Add all keys with one non-zero byte
+
+  for(int keylen = 2; keylen <= maxlen; keylen++)
+  for(int byteA = 0; byteA < keylen; byteA++)
+  {
+    for(int valA = 1; valA <= 255; valA++)
+    {
+      key[byteA] = (uint8_t)valA;
+
+      assert(cursor <= keycount);
+      hash(key,keylen,0,&hashes[cursor++]);
+    }
+
+    key[byteA] = 0;
+  }
+
+  //----------
+  // Add all keys with two non-zero bytes
+
+  for(int keylen = 2; keylen <= maxlen; keylen++)
+  for(int byteA = 0; byteA < keylen-1; byteA++)
+  for(int byteB = byteA+1; byteB < keylen; byteB++)
+  {
+    for(int valA = 1; valA <= 255; valA++)
+    {
+      key[byteA] = (uint8_t)valA;
+
+      for(int valB = 1; valB <= 255; valB++)
+      {
+        key[byteB] = (uint8_t)valB;
+        assert(cursor <= keycount);
+        hash(key,keylen,0,&hashes[cursor++]);
+      }
+
+      key[byteB] = 0;
+    }
+
+    key[byteA] = 0;
+  }
+
+  //----------
+  
+  printf("Actually %d keys\n",cursor);
+
+  assert(cursor == keycount);
+
+  bool result = true;
+
+  result &= TestHashList(hashes,true,false,drawDiagram);
+  printf("\n");
 
   return result;
 }

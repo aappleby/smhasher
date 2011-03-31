@@ -4,7 +4,7 @@
 
 double chooseK ( int n, int k )
 {
-    if(k > (n - k)) k = n - k;
+  if(k > (n - k)) k = n - k;
 
   double c = 1;
 
