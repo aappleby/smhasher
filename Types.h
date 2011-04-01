@@ -3,6 +3,7 @@
 #include "Platform.h"
 #include "Bitvec.h"
 
+#include <memory.h>
 #include <vector>
 #include <map>
 #include <set>
