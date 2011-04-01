@@ -88,54 +88,54 @@ void MurmurHash3_x86_32 ( const void * key, int len,
 } 
 
 //-----------------------------------------------------------------------------
-// This mix is large enough that VC++ refuses to inline it unless we use
-// __forceinline. It's also not all that fast due to register spillage.
+// x86 platforms don't have enough registers to do the c1/c2 mixing step
+// without spilling data onto the stack, so we use inline constants for this
+// block mix.
 
 FORCE_INLINE void bmix32 ( uint32_t & h1, uint32_t & h2,
                            uint32_t & h3, uint32_t & h4, 
                            uint32_t & k1, uint32_t & k2, 
-                           uint32_t & k3, uint32_t & k4, 
-                           uint32_t & c1, uint32_t & c2 )
+                           uint32_t & k3, uint32_t & k4 )
 {
-  k1 *= c1; 
-  k1  = ROTL32(k1,11); 
-  k1 *= c2;
+  k1 *= 0x239b961b; 
+  k1  = ROTL32(k1,15); 
+  k1 *= 0xab0e9789;
+
   h1 ^= k1;
+  h1 = h1*3+0x561ccd1b;
+  h1 = ROTL32(h1,19);
+
+  k2 *= 0x38b34ae5; 
+  k2  = ROTL32(k2,16);
+  k2 *= 0xa1e38b93;
+
+  h2 ^= k2;
+  h2 = h2*3+0x0bcaa747;
+  h2 = ROTL32(h2,17);
+
+  k3 *= 0x4b2f1cc5; 
+  k3  = ROTL32(k3,17); 
+  k3 *= 0x8cd62ad3;
+
+  h3 ^= k3;
+  h3 = h3*3+0x96cd1c35;
+  h3 = ROTL32(h3,15);
+
+  k4 *= 0x561ad8f1; 
+  k4  = ROTL32(k4,18);
+  k4 *= 0xaac75299;
+
+  h4 ^= k4;
+  h4 = h4*3+0x32ac3b17;
+  h4 = ROTL32(h4,13);
+
   h1 += h2;
   h1 += h3;
   h1 += h4;
 
-  h1 = ROTL32(h1,17);
-
-  k2 *= c2; 
-  k2  = ROTL32(k2,11);
-  k2 *= c1;
-  h2 ^= k2;
   h2 += h1;
-
-  h1 = h1*3+0x52dce729;
-  h2 = h2*3+0x38495ab5;
-
-  c1 = c1*5+0x7b7d159c;
-  c2 = c2*5+0x6bce6396;
-
-  k3 *= c1; 
-  k3  = ROTL32(k3,11); 
-  k3 *= c2;
-  h3 ^= k3;
   h3 += h1;
-
-  k4 *= c2; 
-  k4  = ROTL32(k4,11);
-  k4 *= c1;
-  h4 ^= k4;
   h4 += h1;
-
-  h3 = h3*3+0x52dce729;
-  h4 = h4*3+0x38495ab5;
-
-  c1 = c1*5+0x7b7d159c;
-  c2 = c2*5+0x6bce6396;
 }
 
 //----------
@@ -165,22 +165,19 @@ void MurmurHash3_x86_128 ( const void * key, const int len,
   uint32_t h3 = 0xfcba5b2d ^ seed;
   uint32_t h4 = 0x32452e3e ^ seed;
 
-  uint32_t c1 = 0x95543787;
-  uint32_t c2 = 0x2ad7eb25;
-
   //----------
   // body
 
-  const uint32_t * blocks = (const uint32_t *)(data);
+  const uint32_t * blocks = (const uint32_t *)(data + nblocks*16);
 
-  for(int i = 0; i < nblocks; i++)
+  for(int i = -nblocks; i; i++)
   {
     uint32_t k1 = getblock(blocks,i*4+0);
     uint32_t k2 = getblock(blocks,i*4+1);
     uint32_t k3 = getblock(blocks,i*4+2);
     uint32_t k4 = getblock(blocks,i*4+3);
 
-    bmix32(h1,h2,h3,h4, k1,k2,k3,k4, c1,c2);
+    bmix32(h1,h2,h3,h4, k1,k2,k3,k4);
   }
 
   //----------
@@ -213,7 +210,7 @@ void MurmurHash3_x86_128 ( const void * key, const int len,
   case  3: k1 ^= tail[ 2] << 16;
   case  2: k1 ^= tail[ 1] << 8;
   case  1: k1 ^= tail[ 0] << 0;
-           bmix32(h1,h2,h3,h4, k1,k2,k3,k4, c1,c2);
+           bmix32(h1,h2,h3,h4, k1,k2,k3,k4);
   };
 
   //----------
@@ -255,26 +252,26 @@ FORCE_INLINE void bmix64 ( uint64_t & h1, uint64_t & h2,
                            uint64_t & c1, uint64_t & c2 )
 {
   k1 *= c1; 
-  k1  = ROTL64(k1,23); 
+  k1  = ROTL64(k1,29); 
   k1 *= c2;
 
   k2 *= c2; 
-  k2  = ROTL64(k2,23);
+  k2  = ROTL64(k2,33);
   k2 *= c1;
 
-  h1 = ROTL64(h1,17);
+  h1 = ROTL64(h1,27);
   h1 += h2;
   h1 ^= k1;
 
-  h2 = ROTL64(h2,41);
+  h2 = ROTL64(h2,31);
   h2 += h1;
   h2 ^= k2;
 
   h1 = h1*3+0x52dce729;
   h2 = h2*3+0x38495ab5;
 
-  c1 = c1*5+0x7b7d159c;
-  c2 = c2*5+0x6bce6396;
+  c1 = c1*3+0x7b7d159c;
+  c2 = c2*3+0x6bce6396;
 }
 
 //----------
