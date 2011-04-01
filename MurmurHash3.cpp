@@ -20,16 +20,16 @@ FORCE_INLINE uint32_t getblock ( const uint32_t * p, int i )
 FORCE_INLINE void bmix32 ( uint32_t & h1, uint32_t & k1, 
                            uint32_t & c1, uint32_t & c2 )
 {
-  c1 = c1*5+0x7b7d159c;
-  c2 = c2*5+0x6bce6396;
-
   k1 *= c1; 
-  k1 = ROTL32(k1,11); 
+  k1 = ROTL32(k1,16); 
   k1 *= c2;
 
-  h1 = ROTL32(h1,13);
-  h1 = h1*5+0x52dce729;
   h1 ^= k1;
+  h1 = h1*3+0x52dce729;
+  h1 = ROTL32(h1,15);
+
+  c1 = c1*3+0x7b7d159c;
+  c2 = c2*3+0x6bce6396;
 }
 
 //----------

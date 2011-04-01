@@ -3,6 +3,10 @@
 #include "Platform.h"
 #include "Bitvec.h"
 
+#include <vector>
+#include <map>
+#include <set>
+
 //-----------------------------------------------------------------------------
 // If the optimizer detects that a value in a speed test is constant or unused,
 // the optimizer may remove references to it or otherwise create code that
@@ -29,6 +33,25 @@ void MixVCode ( const void * blob, int len );
 //-----------------------------------------------------------------------------
 
 typedef void (*pfHash) ( const void * blob, const int len, const uint32_t seed, void * out );
+
+struct ByteVec : public std::vector<uint8_t>
+{
+  ByteVec ( const void * key, int len )
+  {
+    resize(len);
+    memcpy(&front(),key,len);
+  }
+};
+
+template< typename hashtype, typename keytype >
+struct CollisionMap : public std::map< hashtype, std::vector<keytype> >
+{
+};
+
+template< typename hashtype >
+struct HashSet : public std::set<hashtype>
+{
+};
 
 //-----------------------------------------------------------------------------
 
@@ -61,6 +84,99 @@ public:
   }
 
   pfHash m_hash;
+};
+
+//-----------------------------------------------------------------------------
+// Key-processing callback objects. Simplifies keyset testing a bit.
+
+struct KeyCallback
+{
+  KeyCallback() : m_count(0)
+  {
+  }
+
+  virtual void operator() ( const uint8_t * key, int len )
+  {
+    m_count++;
+  }
+
+  virtual void reserve ( int keycount )
+  {
+  };
+
+  int m_count;
+};
+
+//----------
+
+template<typename hashtype>
+struct HashCallback : public KeyCallback
+{
+  typedef std::vector<hashtype> hashvec;
+
+  HashCallback ( pfHash hash, hashvec & hashes ) : m_pfHash(hash), m_hashes(hashes)
+  {
+    m_hashes.clear();
+  }
+
+  virtual void operator () ( const uint8_t * key, int len )
+  {
+    m_hashes.resize(m_hashes.size() + 1);
+
+    m_pfHash(key,len,0,&m_hashes.back());
+  }
+
+  virtual void reserve ( int keycount )
+  {
+    m_hashes.reserve(keycount);
+  }
+
+  hashvec & m_hashes;
+  pfHash m_pfHash;
+
+  //----------
+
+private:
+
+  HashCallback & operator = ( const HashCallback & );
+};
+
+//----------
+
+template<typename hashtype>
+struct CollisionCallback : public KeyCallback
+{
+  typedef HashSet<hashtype> hashset;
+  typedef CollisionMap<hashtype,ByteVec> collmap;
+
+  CollisionCallback ( pfHash hash, hashset & collisions, collmap & cmap ) 
+  : m_pfHash(hash), 
+    m_collisions(collisions),
+    m_collmap(cmap)
+  {
+  }
+
+  virtual void operator () ( const uint8_t * key, int len )
+  {
+    hashtype h;
+
+    m_pfHash(key,len,0,&h);
+    
+    if(m_collisions.count(h))
+    {
+      m_collmap[h].push_back( ByteVec(key,len) );
+    }
+  }
+
+  //----------
+
+  pfHash m_pfHash;
+  hashset & m_collisions;
+  collmap & m_collmap;
+
+private:
+
+  CollisionCallback & operator = ( const CollisionCallback & c );
 };
 
 //-----------------------------------------------------------------------------

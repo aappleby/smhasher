@@ -435,6 +435,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Experiments.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Experiments.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Platform.cpp"
 				>
 			</File>

@@ -14,9 +14,9 @@ void assert ( bool )
 
 //----------------------------------------------------------------------------
 
-void printbits ( void * blob, int len )
+void printbits ( const void * blob, int len )
 {
-  uint8_t * data = (uint8_t*)blob;
+  const uint8_t * data = (const uint8_t *)blob;
 
   printf("[");
   for(int i = 0; i < len; i++)
@@ -37,7 +37,7 @@ void printbits ( void * blob, int len )
   printf("]");
 }
 
-void printbits2 ( uint8_t * k, int nbytes )
+void printbits2 ( const uint8_t * k, int nbytes )
 {
   printf("[");
 
@@ -55,7 +55,7 @@ void printbits2 ( uint8_t * k, int nbytes )
   printf("]");
 }
 
-void printhex32 ( void * blob, int len )
+void printhex32 ( const void * blob, int len )
 {
   assert((len & 3) == 0);
 
@@ -71,7 +71,7 @@ void printhex32 ( void * blob, int len )
   printf("}");
 }
 
-void printbytes ( void * blob, int len )
+void printbytes ( const void * blob, int len )
 {
   uint8_t * d = (uint8_t*)blob;
 
@@ -85,9 +85,41 @@ void printbytes ( void * blob, int len )
   printf(" };");
 }
 
+void printbytes2 ( const void * blob, int len )
+{
+  uint8_t * d = (uint8_t*)blob;
+
+  for(int i = 0; i < len; i++)
+  {
+    printf("%02x ",d[i]);
+  }
+}
+
+//-----------------------------------------------------------------------------
+// Bit-level manipulation
+
+// These two are from the "Bit Twiddling Hacks" webpage
+
+uint32_t popcount ( uint32_t v )
+{
+	v = v - ((v >> 1) & 0x55555555);                    // reuse input as temporary
+	v = (v & 0x33333333) + ((v >> 2) & 0x33333333);     // temp
+	uint32_t c = ((v + (v >> 4) & 0xF0F0F0F) * 0x1010101) >> 24; // count
+
+	return c;
+}
+
+uint32_t parity ( uint32_t v )
+{
+	v ^= v >> 1;
+	v ^= v >> 2;
+	v = (v & 0x11111111U) * 0x11111111U;
+	return (v >> 28) & 1;
+}
+
 //-----------------------------------------------------------------------------
 
-uint32_t getbit ( void * block, int len, uint32_t bit )
+uint32_t getbit ( const void * block, int len, uint32_t bit )
 {
   uint8_t * b = (uint8_t*)block;
 
@@ -99,7 +131,7 @@ uint32_t getbit ( void * block, int len, uint32_t bit )
   return 0;
 }
 
-uint32_t getbit_wrap ( void * block, int len, uint32_t bit )
+uint32_t getbit_wrap ( const void * block, int len, uint32_t bit )
 {
   uint8_t * b = (uint8_t*)block;
 

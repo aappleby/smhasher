@@ -17,7 +17,7 @@ void BulkSpeedTest ( pfHash hash, uint32_t seed )
 
   printf("Bulk speed test - %d-byte keys\n",blocksize);
 
-  char * block = new char[blocksize + 16];
+  uint8_t * block = new uint8_t[blocksize + 16];
 
   r.rand_p(block,blocksize+16);
 
