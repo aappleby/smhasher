@@ -35,9 +35,13 @@ inline uint32_t f3mix ( uint32_t k )
 }
 
 //-----------------------------------------------------------------------------
+// Sort the hash list, count the total number of collisions and return
+// the first N collisions for further processing
 
 template< typename hashtype >
-int CountCollisions ( std::vector<hashtype> & hashes )
+int FindCollisions ( std::vector<hashtype> & hashes, 
+                     HashSet<hashtype> & collisions,
+                     int maxCollisions )
 {
   int collcount = 0;
 
@@ -45,7 +49,15 @@ int CountCollisions ( std::vector<hashtype> & hashes )
 
   for(size_t i = 1; i < hashes.size(); i++)
   {
-    if(hashes[i] == hashes[i-1]) collcount++;
+    if(hashes[i] == hashes[i-1])
+    {
+      collcount++;
+
+      if((int)collisions.size() < maxCollisions)
+      {
+        collisions.insert(hashes[i]);
+      }
+    }
   }
 
   return collcount;
@@ -90,11 +102,10 @@ int PrintCollisions ( hashfunc<hashtype> hash, std::vector<keytype> & keys )
 //----------------------------------------------------------------------------
 
 template < typename hashtype >
-bool TestHashList ( std::vector<hashtype> & hashes, bool testColl, bool testDist, bool drawDiagram )
+bool TestHashList ( std::vector<hashtype> & hashes, std::vector<hashtype> & collisions, bool testDist, bool drawDiagram )
 {
   bool result = true;
 
-  if(testColl)
   {
     size_t count = hashes.size();
 
@@ -104,10 +115,14 @@ bool TestHashList ( std::vector<hashtype> & hashes, bool testColl, bool testDist
 
     double collcount = 0;
 
-    collcount = CountCollisions(hashes);
+    HashSet<hashtype> collisions;
+
+    collcount = FindCollisions(hashes,collisions,1000);
 
     printf("actual %8.2f (%5.2fx)",collcount, collcount / expected);
 
+    if(sizeof(hashtype) == sizeof(uint32_t))
+    {
     // 2x expected collisions = fail
 
     // #TODO - collision failure cutoff needs to be expressed as a standard deviation instead
@@ -118,6 +133,17 @@ bool TestHashList ( std::vector<hashtype> & hashes, bool testColl, bool testDist
     {
       printf(" !!!!! ");
       result = false;
+    }
+    }
+    else
+    {
+      // For all hashes larger than 32 bits, _any_ collisions are a failure.
+      
+      if(collcount > 0)
+      {
+        printf(" !!!!! ");
+        result = false;
+      }
     }
 
     printf("\n");
@@ -131,6 +157,16 @@ bool TestHashList ( std::vector<hashtype> & hashes, bool testColl, bool testDist
   }
 
   return result;
+}
+
+//----------
+
+template < typename hashtype >
+bool TestHashList ( std::vector<hashtype> & hashes, bool /*testColl*/, bool testDist, bool drawDiagram )
+{
+  std::vector<hashtype> collisions;
+
+  return TestHashList(hashes,collisions,testDist,drawDiagram);
 }
 
 //-----------------------------------------------------------------------------

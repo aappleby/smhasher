@@ -6,12 +6,16 @@
 
 //-----------------------------------------------------------------------------
 
-void     printbits   ( void * blob, int len );
-void     printhex32  ( void * blob, int len );
-void     printbytes  ( void * blob, int len );
+void     printbits   ( const void * blob, int len );
+void     printhex32  ( const void * blob, int len );
+void     printbytes  ( const void * blob, int len );
+void     printbytes2 ( const void * blob, int len );
 
-uint32_t getbit      ( void * blob, int len, uint32_t bit );
-uint32_t getbit_wrap ( void * blob, int len, uint32_t bit );
+uint32_t popcount    ( uint32_t v );
+uint32_t parity      ( uint32_t v );
+
+uint32_t getbit      ( const void * blob, int len, uint32_t bit );
+uint32_t getbit_wrap ( const void * blob, int len, uint32_t bit );
 
 void     setbit      ( void * blob, int len, uint32_t bit );
 void     setbit      ( void * blob, int len, uint32_t bit, uint32_t val );
@@ -23,7 +27,7 @@ void     flipbit     ( void * blob, int len, uint32_t bit );
 int      countbits   ( uint32_t v );
 int      countbits   ( std::vector<uint32_t> & v );
 
-int      countbits   ( void * blob, int len );
+int      countbits   ( const void * blob, int len );
 
 void     invert      ( std::vector<uint32_t> & v );
 

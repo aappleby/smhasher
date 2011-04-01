@@ -66,7 +66,7 @@ HashInfo g_hashes[] =
 
   // MurmurHash3
 
-  { MurmurHash3_x86_32,   32, 0xEA5DFD02, "Murmur3A",    "MurmurHash3 for x86, 32-bit" },
+  { MurmurHash3_x86_32,   32, 0xCB75A3F6, "Murmur3A",    "MurmurHash3 for x86, 32-bit" },
   { MurmurHash3_x86_128, 128, 0x411C981B, "Murmur3C",    "MurmurHash3 for x86, 128-bit" },
   { MurmurHash3_x64_128, 128, 0x04D005BA, "Murmur3F",    "MurmurHash3 for x64, 128-bit" },
 
@@ -220,9 +220,10 @@ void test ( hashfunc<hashtype> hash, HashInfo * info )
   }
 
   //-----------------------------------------------------------------------------
-  // Bit Independence Criteria
+  // Bit Independence Criteria. Interesting, but doesn't tell us much about
+  // collision or distribution.
 
-  if(g_testBIC /*|| g_testAll*/)
+  if(g_testBIC)
   {
     printf("[[[ Bit Independence Criteria ]]]\n\n");
 
@@ -236,7 +237,7 @@ void test ( hashfunc<hashtype> hash, HashInfo * info )
   }
 
   //-----------------------------------------------------------------------------
-  // Keyset 'Cyclic'
+  // Keyset 'Cyclic' - keys of the form "abcdabcdabcd..."
 
   if(g_testCyclic || g_testAll)
   {
@@ -256,23 +257,28 @@ void test ( hashfunc<hashtype> hash, HashInfo * info )
   }
 
   //-----------------------------------------------------------------------------
-  // Keyset 'TwoBytes'
+  // Keyset 'TwoBytes' - all keys up to N bytes containing two non-zero bytes
 
-  if(g_testTwoBytes)
+  // This generates some huge keysets, 128-bit tests will take ~1.3 gigs of RAM.
+
+  if(g_testTwoBytes || g_testAll)
   {
     printf("[[[ Keyset 'TwoBytes' Tests ]]]\n\n");
 
     bool result = true;
     bool drawDiagram = false;
 
-    result &= TwoBytesTest<hashtype>(hash,24,drawDiagram);
+    for(int i = 4; i <= 20; i += 4)
+    {
+      result &= TwoBytesTest2<hashtype>(hash,i,drawDiagram);
+    }
 
     if(!result) printf("*********FAIL*********\n");
     printf("\n");
   }
 
   //-----------------------------------------------------------------------------
-  // Keyset 'Sparse'
+  // Keyset 'Sparse' - keys with all bits 0 except a few
 
   if(g_testSparse || g_testAll)
   {
@@ -295,7 +301,7 @@ void test ( hashfunc<hashtype> hash, HashInfo * info )
   }
 
   //-----------------------------------------------------------------------------
-  // Keyset 'Permutation'
+  // Keyset 'Permutation' - all possible combinations of a set of blocks
 
   if(g_testPermutation || g_testAll)
   {
@@ -543,7 +549,7 @@ int main ( int argc, char ** argv )
     hashToTest = argv[1];
   }
   
-  SetAffinity(2);
+  SetAffinity(3);
 
   SelfTest();
 
@@ -561,20 +567,10 @@ int main ( int argc, char ** argv )
   //g_testDiffDist = true;
   //g_testSparse = true;
   //g_testPermutation = true;
+  //g_testWindow = true;
   //g_testZeroes = true;
 
   testHash(hashToTest);
-
-  /*
-  for(int i = 0; i < sizeof(g_hashes)/sizeof(HashInfo); i++)
-  {
-    testHash(g_hashes[i].name);
-  }
-  */
-
-  //testHash("murmur3a");
-  //testHash("murmur3c");
-  //testHash("murmur3f");
 
   //----------
 
