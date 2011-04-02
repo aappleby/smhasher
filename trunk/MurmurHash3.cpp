@@ -255,23 +255,19 @@ FORCE_INLINE void bmix64 ( uint64_t & h1, uint64_t & h2,
   k1  = ROTL64(k1,29); 
   k1 *= c2;
 
+  h1 ^= k1;
+  h1 = ROTL64(h1,27);
+  h1 += h2;
+  h1 = h1*3+0x52dce729;
+
   k2 *= c2; 
   k2  = ROTL64(k2,33);
   k2 *= c1;
 
-  h1 = ROTL64(h1,27);
-  h1 += h2;
-  h1 ^= k1;
-
+  h2 ^= k2;
   h2 = ROTL64(h2,31);
   h2 += h1;
-  h2 ^= k2;
-
-  h1 = h1*3+0x52dce729;
   h2 = h2*3+0x38495ab5;
-
-  c1 = c1*3+0x7b7d159c;
-  c2 = c2*3+0x6bce6396;
 }
 
 //----------

@@ -12,7 +12,7 @@ void BulkSpeedTest ( pfHash hash, uint32_t seed )
 {
   Rand r(seed);
   
-  const int trials = 9999;
+  const int trials = 29999;
   const int blocksize = 256 * 1024;
 
   printf("Bulk speed test - %d-byte keys\n",blocksize);

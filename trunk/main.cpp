@@ -68,7 +68,7 @@ HashInfo g_hashes[] =
 
   { MurmurHash3_x86_32,   32, 0xCB75A3F6, "Murmur3A",    "MurmurHash3 for x86, 32-bit" },
   { MurmurHash3_x86_128, 128, 0x917EC4EF, "Murmur3C",    "MurmurHash3 for x86, 128-bit" },
-  { MurmurHash3_x64_128, 128, 0xD1CAC156, "Murmur3F",    "MurmurHash3 for x64, 128-bit" },
+  { MurmurHash3_x64_128, 128, 0x9E20536F, "Murmur3F",    "MurmurHash3 for x64, 128-bit" },
 
 };
 
