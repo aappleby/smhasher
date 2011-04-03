@@ -1,6 +1,6 @@
 {{{
 -------------------------------------------------------------------------------
---- Testing lookup3 (Bob Jenkins' lookup3)
+--- Testing lookup3 (Bob Jenkins lookup3)
 
 [[[ Sanity Tests ]]]
 
