@@ -66,9 +66,9 @@ HashInfo g_hashes[] =
 
   // MurmurHash3
 
-  { MurmurHash3_x86_32,   32, 0xCB75A3F6, "Murmur3A",    "MurmurHash3 for x86, 32-bit" },
-  { MurmurHash3_x86_128, 128, 0x917EC4EF, "Murmur3C",    "MurmurHash3 for x86, 128-bit" },
-  { MurmurHash3_x64_128, 128, 0x9E20536F, "Murmur3F",    "MurmurHash3 for x64, 128-bit" },
+  { MurmurHash3_x86_32,   32, 0x3252D141, "Murmur3A",    "MurmurHash3 for x86, 32-bit" },
+  { MurmurHash3_x86_128, 128, 0x13C7ED69, "Murmur3C",    "MurmurHash3 for x86, 128-bit" },
+  { MurmurHash3_x64_128, 128, 0x33949085, "Murmur3F",    "MurmurHash3 for x64, 128-bit" },
 
 };
 
@@ -119,7 +119,7 @@ void test ( hashfunc<hashtype> hash, HashInfo * info )
   const int hashbits = sizeof(hashtype) * 8;
 
   printf("-------------------------------------------------------------------------------\n");
-  printf("--- Testing %s\n\n",info->name);
+  printf("--- Testing %s (%s)\n\n",info->name,info->desc);
 
   //-----------------------------------------------------------------------------
   // Sanity tests
@@ -538,7 +538,7 @@ void testHash ( const char * name )
 
 int main ( int argc, char ** argv )
 {
-  const char * hashToTest = "murmur3f";
+  const char * hashToTest = "murmur3a";
 
   if(argc < 2)
   {
