@@ -2,6 +2,8 @@
 
 = Introduction =
 
+(Note - this information is a bit stale, and refers to an earlier version of Murmur3. I'll rewrite it when I have time.)
+
 MurmurHash3 is the successor to MurmurHash2. It comes in 3 variants - a 32-bit version that targets low latency for hash table use and two 128-bit versions for generating unique identifiers for large blocks of data, one each for x86 and x64 platforms.
 
 == Details ==
@@ -10,26 +12,18 @@ MurmurHash3's mix functions are based on this snippet -
 
 {{{
 k *= c1; 
-k  = _rotl(k,r); 
+k = rotl(k,r1); 
 k *= c2;
 
 h ^= k;
-	
-h = h*m1+n1;
 
-c1 = c1*m2+n2;
-c2 = c2*m3+n3;
+h = rotl(h,r1);	
+h = h*m1+n1;
 }}}
 
-'k' is a block of the key, 'h' is a block of the hash state, 'r'/'nN'/'mN' are static mixing constants, and 'c1' and 'c2' are two dynamic mixing constants.
+'k' is a block of the key, 'h' is a block of the hash state, and 'rN'/'mN'/'cN' are constants.
 
-For each block of the key, we pre-mix it using the two constants and a rotate, xor it into the hash block, mix the hash block, and then mix the two constants we used to mix the key block.
-
-The changing mix constants help ensure that each key block is mixed in a slightly different way, which serves as a 'pattern breaker' - repeated key blocks don't all affect the hash value in the same way, which makes it much less likely that small changes in those blocks can cancel each other out. This improves collision resistance by a significant factor, and makes an otherwise weak-but-fast mix function quite robust.
-
-The 'x = x*m+n' operations are also weak, mixing-wise, but a modern optimizing x86/x64 compiler will convert them into a single 'lea' instruction if the 'm' value is 3, 5, or 9 and the 'n' value is less than 0x8000000. The 'lea' instruction can be evaluated in the CPU pipeline in parallel with some of the multiply and rotate instructions, which makes for a very very fast overall mix.
-
-One downside of the weak-ish mix and the constantly changing 'c1' and 'c2' constants is that it is hard to guarantee that a particular block of the key will be mixed sufficiently before it leaves the hash function - to ensure that the output of the hash function always [Avalanche avalanches], MurmurHash3 adds a stronger finalization step that guarantees that all bits of the input affect all bits of the output equally to within a very small percentage of ideal randomness.
+For each block of the key, we pre-mix it using two constants and a rotate, xor it into the hash block, and them mix the hash block using a rotate and a multiply-add.
 
 MurmurHash3's 32-bit finalizer is
 
