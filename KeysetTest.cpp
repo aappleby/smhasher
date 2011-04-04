@@ -262,3 +262,66 @@ void TwoBytesKeygen ( int maxlen, KeyCallback & c )
 }
 
 //-----------------------------------------------------------------------------
+
+template< typename hashtype >
+void DumpCollisionMap ( CollisionMap<hashtype,ByteVec> & cmap )
+{
+  typedef CollisionMap<hashtype,ByteVec> cmap_t;
+
+  for(cmap_t::iterator it = cmap.begin(); it != cmap.end(); ++it)
+  {
+    const hashtype & hash = (*it).first;
+
+    printf("Hash - ");
+    printbytes(&hash,sizeof(hashtype));
+    printf("\n");
+
+    std::vector<ByteVec> & keys = (*it).second;
+
+    for(int i = 0; i < (int)keys.size(); i++)
+    {
+      ByteVec & key = keys[i];
+
+      printf("Key  - ");
+      printbytes(&key[0],(int)key.size());
+      printf("\n");
+    }
+    printf("\n");
+  }
+
+}
+
+// test code
+
+void ReportCollisions ( pfHash hash )
+{
+  printf("Hashing keyset\n");
+
+  std::vector<uint128_t> hashes;
+
+  HashCallback<uint128_t> c(hash,hashes);
+
+  TwoBytesKeygen(20,c);
+
+  printf("%d hashes\n",hashes.size());
+
+  printf("Finding collisions\n");
+
+  HashSet<uint128_t> collisions;
+
+  FindCollisions(hashes,collisions,1000);
+
+  printf("%d collisions\n",collisions.size());
+
+  printf("Mapping collisions\n");
+
+  CollisionMap<uint128_t,ByteVec> cmap;
+
+  CollisionCallback<uint128_t> c2(hash,collisions,cmap);
+
+  TwoBytesKeygen(20,c2);
+
+  printf("Dumping collisions\n");
+
+  DumpCollisionMap(cmap);
+}

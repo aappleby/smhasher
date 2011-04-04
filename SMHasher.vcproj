@@ -323,10 +323,6 @@
 			Name="Hashes"
 			>
 			<File
-				RelativePath=".\CityHash.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\crc.cpp"
 				>
 			</File>
