@@ -11,6 +11,7 @@ void SetAffinity ( int cpu );
 #if defined(_MSC_VER)
 
 #define FORCE_INLINE	__forceinline
+#define	NEVER_INLINE  __declspec(noinline)
 
 #include <stdlib.h>
 #include <math.h>   // Has to be included before intrin.h or VC complains about 'ceil'
@@ -40,6 +41,7 @@ void SetAffinity ( int cpu );
 #include <stdint.h>
 
 #define	FORCE_INLINE __attribute__((always_inline))
+#define	NEVER_INLINE __attribute__((noinline))
 
 inline uint32_t rotl32 ( uint32_t x, int8_t r )
 {
