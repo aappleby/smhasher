@@ -16,6 +16,7 @@ void testRDTSC ( void )
 void SetAffinity ( int cpu )
 {
   SetProcessAffinityMask(GetCurrentProcess(),cpu);
+  SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
 }
 
 #else

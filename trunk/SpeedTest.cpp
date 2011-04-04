@@ -189,7 +189,7 @@ double SpeedTest ( pfHash hash, uint32_t seed, const int trials, const int block
   {
     r.rand_p(block,blocksize);
     
-    double t = timehash(hash,block,blocksize,itrial);
+    double t = (double)timehash(hash,block,blocksize,itrial);
     
     if(t > 0) times.push_back(t);
   }
@@ -210,9 +210,7 @@ double SpeedTest ( pfHash hash, uint32_t seed, const int trials, const int block
 
 void BulkSpeedTest ( pfHash hash, uint32_t seed )
 {
-  Rand r(seed);
-  
-  const int trials = 999;
+  const int trials = 2999;
   const int blocksize = 256 * 1024;
 
   printf("Bulk speed test - %d-byte keys\n",blocksize);

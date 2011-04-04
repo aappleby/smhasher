@@ -25,53 +25,6 @@ FORCE_INLINE uint64_t getblock ( const uint64_t * p, int i )
 }
 
 //-----------------------------------------------------------------------------
-// Block mix - mix the key block, combine with hash block, mix the hash block,
-// repeat.
-
-FORCE_INLINE void bmix ( uint32_t & h1, uint32_t & k1, 
-                         uint32_t & c1, uint32_t & c2 )
-{
-  k1 *= c1; k1 = ROTL32(k1,15); k1 *= c2; h1 ^= k1;
-
-  h1 = ROTL32(h1,13); h1 = h1*5+0xe6546b64;
-}
-
-//----------
-
-FORCE_INLINE void bmix ( uint64_t & h1, uint64_t & h2, 
-                         uint64_t & k1, uint64_t & k2, 
-                         uint64_t & c1, uint64_t & c2 )
-{
-  k1 *= c1; k1  = ROTL64(k1,31); k1 *= c2; h1 ^= k1;
-
-  h1 = ROTL64(h1,27); h1 += h2; h1 = h1*5+0x52dce729;
-
-  k2 *= c2; k2  = ROTL64(k2,33); k2 *= c1; h2 ^= k2;
-
-  h2 = ROTL64(h2,31); h2 += h1; h2 = h2*5+0x38495ab5;
-}
-
-//----------
-
-FORCE_INLINE void bmix ( uint32_t & h1, uint32_t & h2,
-                         uint32_t & h3, uint32_t & h4, 
-                         uint32_t & k1, uint32_t & k2, 
-                         uint32_t & k3, uint32_t & k4,
-                         uint32_t & c1, uint32_t & c2, 
-                         uint32_t & c3, uint32_t & c4 )
-{
-  k1 *= c1; k1  = ROTL32(k1,15); k1 *= c2; h1 ^= k1;
-  k2 *= c2; k2  = ROTL32(k2,16); k2 *= c3; h2 ^= k2;
-  k3 *= c3; k3  = ROTL32(k3,17); k3 *= c4; h3 ^= k3;
-  k4 *= c4; k4  = ROTL32(k4,18); k4 *= c1; h4 ^= k4;
-
-  h1 = ROTL32(h1,19); h1 += h2; h1 = h1*5+0x561ccd1b;
-  h2 = ROTL32(h2,17); h2 += h3; h2 = h2*5+0x0bcaa747;
-  h3 = ROTL32(h3,15); h3 += h4; h3 = h3*5+0x96cd1c35;
-  h4 = ROTL32(h4,13); h4 += h1; h4 = h4*5+0x32ac3b17;
-}
-
-//-----------------------------------------------------------------------------
 // Finalization mix - force all bits of a hash block to avalanche
 
 FORCE_INLINE uint32_t fmix ( uint32_t h )
@@ -120,7 +73,13 @@ void MurmurHash3_x86_32 ( const void * key, int len,
   {
     uint32_t k1 = getblock(blocks,i);
 
-    bmix(h1,k1,c1,c2);
+    k1 *= c1;
+    k1 = ROTL32(k1,15);
+    k1 *= c2;
+    
+    h1 ^= k1;
+    h1 = ROTL32(h1,13); 
+    h1 = h1*5+0xe6546b64;
   }
 
   //----------
@@ -178,7 +137,21 @@ void MurmurHash3_x86_128 ( const void * key, const int len,
     uint32_t k3 = getblock(blocks,i*4+2);
     uint32_t k4 = getblock(blocks,i*4+3);
 
-    bmix(h1,h2,h3,h4, k1,k2,k3,k4, c1, c2, c3, c4);
+    k1 *= c1; k1  = ROTL32(k1,15); k1 *= c2; h1 ^= k1;
+
+    h1 = ROTL32(h1,19); h1 += h2; h1 = h1*5+0x561ccd1b;
+
+    k2 *= c2; k2  = ROTL32(k2,16); k2 *= c3; h2 ^= k2;
+
+    h2 = ROTL32(h2,17); h2 += h3; h2 = h2*5+0x0bcaa747;
+
+    k3 *= c3; k3  = ROTL32(k3,17); k3 *= c4; h3 ^= k3;
+
+    h3 = ROTL32(h3,15); h3 += h4; h3 = h3*5+0x96cd1c35;
+
+    k4 *= c4; k4  = ROTL32(k4,18); k4 *= c1; h4 ^= k4;
+
+    h4 = ROTL32(h4,13); h4 += h1; h4 = h4*5+0x32ac3b17;
   }
 
   //----------
@@ -220,7 +193,7 @@ void MurmurHash3_x86_128 ( const void * key, const int len,
   //----------
   // finalization
 
-  h4 ^= len;
+  h1 ^= len; h2 ^= len; h3 ^= len; h4 ^= len;
 
   h1 += h2; h1 += h3; h1 += h4;
   h2 += h1; h3 += h1; h4 += h1;
@@ -263,7 +236,13 @@ void MurmurHash3_x64_128 ( const void * key, const int len,
     uint64_t k1 = getblock(blocks,i*2+0);
     uint64_t k2 = getblock(blocks,i*2+1);
 
-    bmix(h1,h2,k1,k2,c1,c2);
+    k1 *= c1; k1  = ROTL64(k1,31); k1 *= c2; h1 ^= k1;
+
+    h1 = ROTL64(h1,27); h1 += h2; h1 = h1*5+0x52dce729;
+
+    k2 *= c2; k2  = ROTL64(k2,33); k2 *= c1; h2 ^= k2;
+
+    h2 = ROTL64(h2,31); h2 += h1; h2 = h2*5+0x38495ab5;
   }
 
   //----------
@@ -299,7 +278,7 @@ void MurmurHash3_x64_128 ( const void * key, const int len,
   //----------
   // finalization
 
-  h2 ^= len;
+  h1 ^= len; h2 ^= len;
 
   h1 += h2;
   h2 += h1;
