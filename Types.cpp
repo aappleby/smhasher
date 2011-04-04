@@ -2,6 +2,8 @@
 
 #include "Random.h"
 
+#include <stdio.h>
+
 uint32_t MurmurOAAT ( const void * blob, int len, uint32_t seed );
 
 //-----------------------------------------------------------------------------
