@@ -549,7 +549,9 @@ int main ( int argc, char ** argv )
     hashToTest = argv[1];
   }
   
-  SetAffinity(3);
+  // Code runs on the 3rd CPU by default
+
+  SetAffinity((1 << 2));
 
   SelfTest();
 
