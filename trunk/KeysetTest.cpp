@@ -268,7 +268,7 @@ void DumpCollisionMap ( CollisionMap<hashtype,ByteVec> & cmap )
 {
   typedef CollisionMap<hashtype,ByteVec> cmap_t;
 
-  for(cmap_t::iterator it = cmap.begin(); it != cmap.end(); ++it)
+  for(typename cmap_t::iterator it = cmap.begin(); it != cmap.end(); ++it)
   {
     const hashtype & hash = (*it).first;
 
@@ -303,7 +303,7 @@ void ReportCollisions ( pfHash hash )
 
   TwoBytesKeygen(20,c);
 
-  printf("%d hashes\n",hashes.size());
+  printf("%d hashes\n",(int)hashes.size());
 
   printf("Finding collisions\n");
 
@@ -311,7 +311,7 @@ void ReportCollisions ( pfHash hash )
 
   FindCollisions(hashes,collisions,1000);
 
-  printf("%d collisions\n",collisions.size());
+  printf("%d collisions\n",(int)collisions.size());
 
   printf("Mapping collisions\n");
 
