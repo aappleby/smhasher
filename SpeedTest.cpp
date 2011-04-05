@@ -169,11 +169,11 @@ double SpeedTest ( pfHash hash, uint32_t seed, const int trials, const int block
 {
   Rand r(seed);
   
-  uint8_t * buf = new uint8_t[blocksize + 64];
+  uint8_t * buf = new uint8_t[blocksize + 512];
 
   uint64_t t1 = reinterpret_cast<uint64_t>(buf);
   
-  t1 = (t1 + 15) & 0xFFFFFFFFFFFFFFF0;
+  t1 = (t1 + 255) & 0xFFFFFFFFFFFFFF00;
   t1 += align;
   
   uint8_t * block = reinterpret_cast<uint8_t*>(t1);
