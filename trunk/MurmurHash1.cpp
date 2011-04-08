@@ -1,7 +1,6 @@
-#include "MurmurHash1.h"
-
 //-----------------------------------------------------------------------------
-// MurmurHash1, by Austin Appleby
+// MurmurHash was written by Austin Appleby, and is placed in the public
+// domain. The author hereby disclaims copyright to this source code.
 
 // Note - This code makes a few assumptions about how your machine behaves -
 
@@ -13,6 +12,10 @@
 // 1. It will not work incrementally.
 // 2. It will not produce the same results on little-endian and big-endian
 //    machines.
+
+#include "MurmurHash1.h"
+
+//-----------------------------------------------------------------------------
 
 uint32_t MurmurHash1 ( const void * key, int len, uint32_t seed )
 {

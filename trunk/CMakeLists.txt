@@ -17,12 +17,7 @@ add_library(
   md5.cpp
   MurmurHash1.cpp
   MurmurHash2.cpp
-  MurmurHash2_test.cpp
   MurmurHash3.cpp
-  MurmurHash64.cpp
-  MurmurHashAligned2.cpp
-  MurmurHashAligned.cpp
-  MurmurHashNeutral2.cpp
   Platform.cpp
   Random.cpp
   sha1.cpp
