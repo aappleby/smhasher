@@ -82,9 +82,11 @@ A million repetitions of "a"
 
 #include "sha1.h"
 
+#if defined(_MSC_VER)
 #pragma warning(disable : 4267)
 #pragma warning(disable : 4996)
 #pragma warning(disable : 4100)
+#endif
 
 void SHA1_Transform(uint32_t state[5], const uint8_t buffer[64]);
 
