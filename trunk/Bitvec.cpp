@@ -104,7 +104,7 @@ uint32_t popcount ( uint32_t v )
 {
 	v = v - ((v >> 1) & 0x55555555);                    // reuse input as temporary
 	v = (v & 0x33333333) + ((v >> 2) & 0x33333333);     // temp
-	uint32_t c = ((v + (v >> 4) & 0xF0F0F0F) * 0x1010101) >> 24; // count
+	uint32_t c = ((v + ((v >> 4) & 0xF0F0F0F)) * 0x1010101) >> 24; // count
 
 	return c;
 }
@@ -184,7 +184,7 @@ int countbits ( uint32_t v )
 {
   v = v - ((v >> 1) & 0x55555555);                    // reuse input as temporary
   v = (v & 0x33333333) + ((v >> 2) & 0x33333333);     // temp
-  int c = ((v + (v >> 4) & 0xF0F0F0F) * 0x1010101) >> 24; // count
+  int c = ((v + ((v >> 4) & 0xF0F0F0F)) * 0x1010101) >> 24; // count
 
   return c;
 }

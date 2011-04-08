@@ -8,7 +8,9 @@ uint32_t MurmurOAAT ( const void * blob, int len, uint32_t seed );
 
 //-----------------------------------------------------------------------------
 
+#if defined(_MSC_VER)
 #pragma optimize( "", off )
+#endif
 
 void blackhole ( uint32_t )
 {
@@ -19,7 +21,9 @@ uint32_t whitehole ( void )
   return 0;
 }
 
+#if defined(_MSC_VER)
 #pragma optimize( "", on ) 
+#endif
 
 uint32_t g_verify = 1;
 

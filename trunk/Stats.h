@@ -100,6 +100,92 @@ int PrintCollisions ( hashfunc<hashtype> hash, std::vector<keytype> & keys )
 }
 
 //----------------------------------------------------------------------------
+// Measure the distribution "score" for each possible N-bit span up to 20 bits
+
+template< typename hashtype >
+double TestDistribution ( std::vector<hashtype> & hashes, bool drawDiagram )
+{
+  printf("Testing distribution - ");
+
+  if(drawDiagram) printf("\n");
+
+  const int hashbits = sizeof(hashtype) * 8;
+
+  int maxwidth = 20;
+
+  // We need at least 5 keys per bin to reliably test distribution biases
+  // down to 1%, so don't bother to test sparser distributions than that
+
+  while(double(hashes.size()) / double(1 << maxwidth) < 5.0)
+  {
+    maxwidth--;
+  }
+
+  std::vector<int> bins;
+  bins.resize(1 << maxwidth);
+
+  double worst = 0;
+  int worstStart = -1;
+  int worstWidth = -1;
+
+  for(int start = 0; start < hashbits; start++)
+  {
+    int width = maxwidth;
+    int bincount = (1 << width);
+
+    memset(&bins[0],0,sizeof(int)*bincount);
+
+    for(size_t j = 0; j < hashes.size(); j++)
+    {
+      hashtype & hash = hashes[j];
+
+      uint32_t index = window(&hash,sizeof(hash),start,width);
+
+      bins[index]++;
+    }
+
+    // Test the distribution, then fold the bins in half,
+    // repeat until we're down to 256 bins
+
+    if(drawDiagram) printf("[");
+
+    while(bincount >= 256)
+    {
+      double n = calcScore(&bins[0],bincount,(int)hashes.size());
+
+      if(drawDiagram) plot(n);
+
+      if(n > worst)
+      {
+        worst = n;
+        worstStart = start;
+        worstWidth = width;
+      }
+
+      width--;
+      bincount /= 2;
+
+      if(width < 8) break;
+
+      for(int i = 0; i < bincount; i++)
+      {
+        bins[i] += bins[i+bincount];
+      }
+    }
+
+    if(drawDiagram) printf("]\n");
+  }
+
+  double pct = worst * 100.0;
+
+  printf("Worst bias is the %3d-bit window at bit %3d - %5.3f%%",worstWidth,worstStart,pct);
+  if(pct >= 1.0) printf(" !!!!! ");
+  printf("\n");
+
+  return worst;
+}
+
+//----------------------------------------------------------------------------
 
 template < typename hashtype >
 bool TestHashList ( std::vector<hashtype> & hashes, std::vector<hashtype> & collisions, bool testDist, bool drawDiagram )
@@ -261,93 +347,6 @@ double TestDistributionBytepairs ( std::vector<hashtype> & hashes, bool drawDiag
   return worst;
 }
 
-
-//----------------------------------------------------------------------------
-// Measure the distribution "score" for each possible N-bit span up to 20 bits
-
-template< typename hashtype >
-double TestDistribution ( std::vector<hashtype> & hashes, bool drawDiagram )
-{
-  printf("Testing distribution - ");
-
-  if(drawDiagram) printf("\n");
-
-  const int hashbits = sizeof(hashtype) * 8;
-
-  int maxwidth = 20;
-
-  // We need at least 5 keys per bin to reliably test distribution biases
-  // down to 1%, so don't bother to test sparser distributions than that
-
-  while(double(hashes.size()) / double(1 << maxwidth) < 5.0)
-  {
-    maxwidth--;
-  }
-
-  std::vector<int> bins;
-  bins.resize(1 << maxwidth);
-
-  double worst = 0;
-  int worstStart = -1;
-  int worstWidth = -1;
-
-  for(int start = 0; start < hashbits; start++)
-  {
-    int width = maxwidth;
-    int bincount = (1 << width);
-
-    memset(&bins[0],0,sizeof(int)*bincount);
-
-    for(size_t j = 0; j < hashes.size(); j++)
-    {
-      hashtype & hash = hashes[j];
-
-      uint32_t index = window(&hash,sizeof(hash),start,width);
-
-      bins[index]++;
-    }
-
-    // Test the distribution, then fold the bins in half,
-    // repeat until we're down to 256 bins
-
-    if(drawDiagram) printf("[");
-
-    while(bincount >= 256)
-    {
-      double n = calcScore(&bins[0],bincount,(int)hashes.size());
-
-      if(drawDiagram) plot(n);
-
-      if(n > worst)
-      {
-        worst = n;
-        worstStart = start;
-        worstWidth = width;
-      }
-
-      width--;
-      bincount /= 2;
-
-      if(width < 8) break;
-
-      for(int i = 0; i < bincount; i++)
-      {
-        bins[i] += bins[i+bincount];
-      }
-    }
-
-    if(drawDiagram) printf("]\n");
-  }
-
-  double pct = worst * 100.0;
-
-  printf("Worst bias is the %3d-bit window at bit %3d - %5.3f%%",worstWidth,worstStart,pct);
-  if(pct >= 1.0) printf(" !!!!! ");
-  printf("\n");
-
-  return worst;
-}
-
 //-----------------------------------------------------------------------------
 // Simplified test - only check 64k distributions, and only on byte boundaries
 
@@ -376,7 +375,7 @@ void TestDistributionFast ( std::vector<hashtype> & hashes, double & dworst, dou
       bins[index]++;
     }
 
-    double n = calcScore((int*)bins.begin(),(int)bins.size(),(int)hashes.size());
+    double n = calcScore(&bins.front(),(int)bins.size(),(int)hashes.size());
     
     davg += n;
 

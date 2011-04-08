@@ -7,6 +7,7 @@
 
    http://www.azillionmonkeys.com/qed/hash.html */
 
+/*
 #undef get16bits
 #if (defined(__GNUC__) && defined(__i386__)) || defined(__WATCOMC__) \
   || defined(_MSC_VER) || defined (__BORLANDC__) || defined (__TURBOC__)
@@ -17,8 +18,14 @@
 #define get16bits(d) ((((uint32_t)(((const uint8_t *)(d))[1])) << 8)\
                        +(uint32_t)(((const uint8_t *)(d))[0]) )
 #endif
+*/
 
-uint32_t SuperFastHash (const char * data, int len) {
+FORCE_INLINE uint16_t get16bits ( const void * p )
+{
+  return *(const uint16_t*)p;
+}
+
+uint32_t SuperFastHash (const signed char * data, int len) {
 uint32_t hash = 0, tmp;
 int rem;
 
@@ -65,5 +72,5 @@ int rem;
 
 void SuperFastHash     ( const void * key, int len, uint32_t /*seed*/, void * out )
 {
-  *(uint32_t*)out = SuperFastHash((const char*)key,len);
+  *(uint32_t*)out = SuperFastHash((const signed char*)key,len);
 }
