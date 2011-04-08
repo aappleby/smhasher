@@ -1,7 +1,6 @@
-#include "MurmurHash2.h"
-
 //-----------------------------------------------------------------------------
-// MurmurHash2, by Austin Appleby
+// MurmurHash3 was written by Austin Appleby, and is placed in the public
+// domain. The author hereby disclaims copyright to this source code.
 
 // Note - This code makes a few assumptions about how your machine behaves -
 
@@ -13,6 +12,27 @@
 // 1. It will not work incrementally.
 // 2. It will not produce the same results on little-endian and big-endian
 //    machines.
+
+#include "MurmurHash2.h"
+
+//-----------------------------------------------------------------------------
+// Platform-specific functions and macros
+
+// Microsoft Visual Studio
+
+#if defined(_MSC_VER)
+
+#define BIG_CONSTANT(x) (x)
+
+// Other compilers
+
+#else	// defined(_MSC_VER)
+
+#define BIG_CONSTANT(x) (x##LLU)
+
+#endif // !defined(_MSC_VER)
+
+//-----------------------------------------------------------------------------
 
 uint32_t MurmurHash2 ( const void * key, int len, uint32_t seed )
 {
