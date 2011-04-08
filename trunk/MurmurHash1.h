@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// MurmurHash was written by Austin Appleby, and is placed in the public
+// MurmurHash1 was written by Austin Appleby, and is placed in the public
 // domain. The author hereby disclaims copyright to this source code.
 
 #ifndef _MURMURHASH1_H_

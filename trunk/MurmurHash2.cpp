@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// MurmurHash3 was written by Austin Appleby, and is placed in the public
+// MurmurHash2 was written by Austin Appleby, and is placed in the public
 // domain. The author hereby disclaims copyright to this source code.
 
 // Note - This code makes a few assumptions about how your machine behaves -
@@ -389,6 +389,7 @@ uint32_t MurmurHashNeutral2 ( const void * key, int len, uint32_t seed )
 // Performance will be lower than MurmurHash2
 
 #define MIX(h,k,m) { k *= m; k ^= k >> r; k *= m; h *= m; h ^= k; }
+
 
 uint32_t MurmurHashAligned2 ( const void * key, int len, uint32_t seed )
 {
