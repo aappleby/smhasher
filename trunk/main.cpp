@@ -68,7 +68,7 @@ HashInfo g_hashes[] =
 
   { MurmurHash3_x86_32,   32, 0x3252D141, "Murmur3A",    "MurmurHash3 for x86, 32-bit" },
   { MurmurHash3_x86_128, 128, 0xB3ECE62A, "Murmur3C",    "MurmurHash3 for x86, 128-bit" },
-  { MurmurHash3_x64_128, 128, 0x833607F9, "Murmur3F",    "MurmurHash3 for x64, 128-bit" },
+  { MurmurHash3_x64_128, 128, 0x6384BA69, "Murmur3F",    "MurmurHash3 for x64, 128-bit" },
 
 };
 
@@ -103,7 +103,8 @@ void SelfTest ( void )
     for(int i = 0; i < sizeof(g_hashes) / sizeof(HashInfo); i++)
     {
       HashInfo * info = & g_hashes[i];
-
+      
+      printf("%16s - ",info->name);
       pass &= VerificationTest(info->hash,info->hashbits,info->verification,true);
     }
 

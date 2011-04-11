@@ -310,7 +310,7 @@ void MurmurHash3_x64_128 ( const void * key, const int len,
   case  3: k1 ^= uint64_t(tail[ 2]) << 16;
   case  2: k1 ^= uint64_t(tail[ 1]) << 8;
   case  1: k1 ^= uint64_t(tail[ 0]) << 0;
-           k1 *= c1; k1  = ROTL64(k1,29); k1 *= c2; h1 ^= k1;
+           k1 *= c1; k1  = ROTL64(k1,31); k1 *= c2; h1 ^= k1;
   };
 
   //----------
