@@ -323,6 +323,14 @@
 			Name="Hashes"
 			>
 			<File
+				RelativePath=".\City.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\City.h"
+				>
+			</File>
+			<File
 				RelativePath=".\crc.cpp"
 				>
 			</File>

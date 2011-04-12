@@ -173,7 +173,7 @@ double SpeedTest ( pfHash hash, uint32_t seed, const int trials, const int block
 
   uint64_t t1 = reinterpret_cast<uint64_t>(buf);
   
-  t1 = (t1 + 255) & 0xFFFFFFFFFFFFFF00;
+  t1 = (t1 + 255) & BIG_CONSTANT(0xFFFFFFFFFFFFFF00);
   t1 += align;
   
   uint8_t * block = reinterpret_cast<uint8_t*>(t1);
