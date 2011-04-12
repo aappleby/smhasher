@@ -25,6 +25,7 @@ void SetAffinity ( int cpu )
 
 void SetAffinity ( int /*cpu*/ )
 {
+#ifndef __CYGWIN__
   cpu_set_t mask;
     
   CPU_ZERO(&mask);
@@ -35,6 +36,7 @@ void SetAffinity ( int /*cpu*/ )
   {
     printf("WARNING: Could not set CPU affinity\n");
   }
+#endif
 }
 
 #endif

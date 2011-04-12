@@ -9,6 +9,7 @@ add_library(
   AvalancheTest.cpp
   Bitslice.cpp
   Bitvec.cpp
+  City.cpp
   crc.cpp
   DifferentialTest.cpp
   Hashes.cpp

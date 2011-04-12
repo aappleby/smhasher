@@ -33,6 +33,8 @@ void SuperFastHash         ( const void * key, int len, uint32_t seed, void * ou
 void lookup3_test          ( const void * key, int len, uint32_t seed, void * out );
 void MurmurOAAT_test       ( const void * key, int len, uint32_t seed, void * out );
 void Crap8_test            ( const void * key, int len, uint32_t seed, void * out );
+void CityHash128_test      ( const void * key, int len, uint32_t seed, void * out );
+void CityHash64_test       ( const void * key, int len, uint32_t seed, void * out );
 
 uint32_t MurmurOAAT ( const void * key, int len, uint32_t seed );
 
