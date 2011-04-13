@@ -239,7 +239,7 @@ void lshift32 ( void * blob, int len, int c )
   int nbytes  = len;
   int ndwords = nbytes / 4;
 
-  uint32_t * k = (uint32_t*)blob;
+  uint32_t * k = reinterpret_cast<uint32_t*>(blob);
 
   if(c == 0) return;
 

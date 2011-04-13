@@ -27,7 +27,7 @@
 // possible hash functions, by using SIMD instructions, or by
 // compromising on hash quality.
 
-#include "city.h"
+#include "City.h"
 
 #include <algorithm>
 
