@@ -96,9 +96,9 @@ void FilterOutliers ( std::vector<double> & v )
 {
   std::sort(v.begin(),v.end());
   
-  int len = 0;
+  size_t len = 0;
   
-  for(int x = 0x40000000; x; x = x >> 1 )
+  for(size_t x = 0x40000000; x; x = x >> 1 )
   {
     if((len | x) >= v.size()) continue;
     

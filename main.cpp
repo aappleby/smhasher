@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 #include <time.h>
+#include <unistd.h>
 
 //-----------------------------------------------------------------------------
 // Configuration. TODO - move these to command-line flags
@@ -40,7 +41,7 @@ struct HashInfo
   const char * desc;
 };
 
-HashInfo g_hashes[] = 
+HashInfo g_hashes[] =
 {
   { DoNothingHash,        32, 0x00000000, "donothing32", "Do-Nothing function (only valid for measuring call overhead)" },
   { DoNothingHash,        64, 0x00000000, "donothing64", "Do-Nothing function (only valid for measuring call overhead)" },
@@ -56,7 +57,7 @@ HashInfo g_hashes[] =
   { SuperFastHash,        32, 0x980ACD1D, "superfast",   "Paul Hsieh's SuperFastHash" },
   { MurmurOAAT_test,      32, 0x5363BD98, "MurmurOAAT",  "Murmur one-at-a-time" },
   { Crap8_test,           32, 0x743E97A1, "Crap8",       "Crap8" },
-  
+
   { CityHash64_test,      64, 0x45754A6F, "City64",      "Google CityHash128WithSeed" },
   { CityHash128_test,    128, 0x94B0EF46, "City128",     "Google CityHash128WithSeed" },
   
@@ -75,9 +76,9 @@ HashInfo g_hashes[] =
 
 };
 
-HashInfo * findHash ( const char * name ) 
+HashInfo * findHash ( const char * name )
 {
-  for(int i = 0; i < sizeof(g_hashes) / sizeof(HashInfo); i++)
+  for(size_t i = 0; i < sizeof(g_hashes) / sizeof(HashInfo); i++)
   {
     if(_stricmp(name,g_hashes[i].name) == 0) return &g_hashes[i];
   }
@@ -92,7 +93,7 @@ void SelfTest ( void )
 {
   bool pass = true;
 
-  for(int i = 0; i < sizeof(g_hashes) / sizeof(HashInfo); i++)
+  for(size_t i = 0; i < sizeof(g_hashes) / sizeof(HashInfo); i++)
   {
     HashInfo * info = & g_hashes[i];
 
@@ -103,10 +104,10 @@ void SelfTest ( void )
   {
     printf("Self-test FAILED!\n");
 
-    for(int i = 0; i < sizeof(g_hashes) / sizeof(HashInfo); i++)
+    for(size_t i = 0; i < sizeof(g_hashes) / sizeof(HashInfo); i++)
     {
       HashInfo * info = & g_hashes[i];
-      
+
       printf("%16s - ",info->name);
       pass &= VerificationTest(info->hash,info->hashbits,info->verification,true);
     }
@@ -192,7 +193,7 @@ void test ( hashfunc<hashtype> hash, HashInfo * info )
 
   //-----------------------------------------------------------------------------
   // Avalanche tests
-  
+
   if(g_testAvalanche || g_testAll)
   {
     printf("[[[ Avalanche Tests ]]]\n\n");
@@ -255,7 +256,7 @@ void test ( hashfunc<hashtype> hash, HashInfo * info )
     result &= CyclicKeyTest<hashtype>(hash,sizeof(hashtype)+2,8,10000000,drawDiagram);
     result &= CyclicKeyTest<hashtype>(hash,sizeof(hashtype)+3,8,10000000,drawDiagram);
     result &= CyclicKeyTest<hashtype>(hash,sizeof(hashtype)+4,8,10000000,drawDiagram);
-    
+
     if(!result) printf("*********FAIL*********\n");
     printf("\n");
   }
@@ -296,7 +297,7 @@ void test ( hashfunc<hashtype> hash, HashInfo * info )
     result &= SparseKeyTest<  48,hashtype>(hash,5,true,true,true,drawDiagram);
     result &= SparseKeyTest<  56,hashtype>(hash,5,true,true,true,drawDiagram);
     result &= SparseKeyTest<  64,hashtype>(hash,5,true,true,true,drawDiagram);
-    result &= SparseKeyTest<  96,hashtype>(hash,4,true,true,true,drawDiagram); 
+    result &= SparseKeyTest<  96,hashtype>(hash,4,true,true,true,drawDiagram);
     result &= SparseKeyTest< 256,hashtype>(hash,3,true,true,true,drawDiagram);
     result &= SparseKeyTest<2048,hashtype>(hash,2,true,true,true,drawDiagram);
 
@@ -319,8 +320,8 @@ void test ( hashfunc<hashtype> hash, HashInfo * info )
 
       uint32_t blocks[] =
       {
-        0x00000000, 
-        
+        0x00000000,
+
         0x00000001, 0x00000002, 0x00000003, 0x00000004, 0x00000005, 0x00000006, 0x00000007,
       };
 
@@ -338,8 +339,8 @@ void test ( hashfunc<hashtype> hash, HashInfo * info )
 
       uint32_t blocks[] =
       {
-        0x00000000, 
-        
+        0x00000000,
+
         0x20000000, 0x40000000, 0x60000000, 0x80000000, 0xA0000000, 0xC0000000, 0xE0000000
       };
 
@@ -357,8 +358,8 @@ void test ( hashfunc<hashtype> hash, HashInfo * info )
 
       uint32_t blocks[] =
       {
-        0x00000000, 
-        
+        0x00000000,
+
         0x80000000,
       };
 
@@ -376,8 +377,8 @@ void test ( hashfunc<hashtype> hash, HashInfo * info )
 
       uint32_t blocks[] =
       {
-        0x00000000, 
-        
+        0x00000000,
+
         0x00000001,
       };
 
@@ -395,8 +396,8 @@ void test ( hashfunc<hashtype> hash, HashInfo * info )
 
       uint32_t blocks[] =
       {
-        0x00000000, 
-        
+        0x00000000,
+
         0x00000001, 0x00000002, 0x00000003, 0x00000004, 0x00000005, 0x00000006, 0x00000007,
 
         0x80000000, 0x40000000, 0xC0000000, 0x20000000, 0xA0000000, 0x60000000, 0xE0000000
@@ -495,9 +496,9 @@ void VerifyHash ( const void * key, int len, uint32_t seed, void * out )
 {
   g_inputVCode = MurmurOAAT(key,len,g_inputVCode);
   g_inputVCode = MurmurOAAT(&seed,sizeof(uint32_t),g_inputVCode);
-  
+
   g_hashUnderTest->hash(key,len,seed,out);
-  
+
   g_outputVCode = MurmurOAAT(out,g_hashUnderTest->hashbits/8,g_outputVCode);
 }
 
@@ -506,7 +507,7 @@ void VerifyHash ( const void * key, int len, uint32_t seed, void * out )
 void testHash ( const char * name )
 {
   HashInfo * pInfo = findHash(name);
-  
+
   if(pInfo == NULL)
   {
     printf("Invalid hash '%s' specified\n",name);
@@ -552,7 +553,7 @@ int main ( int argc, char ** argv )
   {
     hashToTest = argv[1];
   }
-  
+
   // Code runs on the 3rd CPU by default
 
   SetAffinity((1 << 2));

@@ -195,7 +195,7 @@ public:
 
   Blob()
   {
-    for(int i = 0; i < sizeof(bytes); i++)
+    for(size_t i = 0; i < sizeof(bytes); i++)
     {
       bytes[i] = 0;
     }
@@ -203,7 +203,7 @@ public:
 
   Blob ( int x )
   {
-    for(int i = 0; i < sizeof(bytes); i++)
+    for(size_t i = 0; i < sizeof(bytes); i++)
     {
       bytes[i] = 0;
     }
@@ -213,7 +213,7 @@ public:
 
   Blob ( const Blob & k )
   {
-    for(int i = 0; i < sizeof(bytes); i++)
+    for(size_t i = 0; i < sizeof(bytes); i++)
     {
       bytes[i] = k.bytes[i];
     }
@@ -221,7 +221,7 @@ public:
 
   Blob & operator = ( const Blob & k )
   {
-    for(int i = 0; i < sizeof(bytes); i++)
+    for(size_t i = 0; i < sizeof(bytes); i++)
     {
       bytes[i] = k.bytes[i];
     }
@@ -235,18 +235,18 @@ public:
     set(&t,16);
   }
 
-  void set ( const void * blob, int len )
+  void set ( const void * blob, size_t len )
   {
     const uint8_t * k = (const uint8_t*)blob;
 
     len = len > sizeof(bytes) ? sizeof(bytes) : len;
 
-    for(int i = 0; i < len; i++)
+    for(size_t i = 0; i < len; i++)
     {
       bytes[i] = k[i];
     }
 
-    for(int i = len; i < sizeof(bytes); i++)
+    for(size_t i = len; i < sizeof(bytes); i++)
     {
       bytes[i] = 0;
     }
@@ -267,7 +267,7 @@ public:
   
   bool operator < ( const Blob & k ) const
   {
-    for(int i = 0; i < sizeof(bytes); i++)
+    for(size_t i = 0; i < sizeof(bytes); i++)
     {
       if(bytes[i] < k.bytes[i]) return true;
       if(bytes[i] > k.bytes[i]) return false;
@@ -278,7 +278,7 @@ public:
 
   bool operator == ( const Blob & k ) const
   {
-    for(int i = 0; i < sizeof(bytes); i++)
+    for(size_t i = 0; i < sizeof(bytes); i++)
     {
       if(bytes[i] != k.bytes[i]) return false;
     }
@@ -298,7 +298,7 @@ public:
   {
     Blob t;
 
-    for(int i = 0; i < sizeof(bytes); i++)
+    for(size_t i = 0; i < sizeof(bytes); i++)
     {
       t.bytes[i] = bytes[i] ^ k.bytes[i];
     }
@@ -308,7 +308,7 @@ public:
 
   Blob & operator ^= ( const Blob & k )
   {
-    for(int i = 0; i < sizeof(bytes); i++)
+    for(size_t i = 0; i < sizeof(bytes); i++)
     {
       bytes[i] ^= k.bytes[i];
     }
@@ -323,7 +323,7 @@ public:
 
   Blob & operator &= ( const Blob & k )
   {
-    for(int i = 0; i < sizeof(bytes); i++)
+    for(size_t i = 0; i < sizeof(bytes); i++)
     {
       bytes[i] &= k.bytes[i];
     }
