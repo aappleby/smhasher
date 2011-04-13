@@ -63,11 +63,11 @@ double CalcStdv ( std::vector<double> & v, int a, int b )
 // Return true if the largest value in v[0,len) is more than three
 // standard deviations from the mean
 
-bool ContainsOutlier ( std::vector<double> & v, int len )
+bool ContainsOutlier ( std::vector<double> & v, size_t len )
 {
   double mean = 0;
   
-  for(int i = 0; i < len; i++)
+  for(size_t i = 0; i < len; i++)
   {
     mean += v[i];
   }
@@ -76,7 +76,7 @@ bool ContainsOutlier ( std::vector<double> & v, int len )
   
   double stdv = 0;
   
-  for(int i = 0; i < len; i++)
+  for(size_t i = 0; i < len; i++)
   {
     double x = v[i] - mean;
     stdv += x*x;

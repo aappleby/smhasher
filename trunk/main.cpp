@@ -7,7 +7,6 @@
 
 #include <stdio.h>
 #include <time.h>
-#include <unistd.h>
 
 //-----------------------------------------------------------------------------
 // Configuration. TODO - move these to command-line flags
