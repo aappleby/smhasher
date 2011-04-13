@@ -43,7 +43,7 @@ bool isprime ( uint32_t x )
     199,211,223,227,229,233,239,241,251
   };
 
-  for(int i=0; i < sizeof(p)/sizeof(uint32_t); i++)
+  for(size_t i=0; i < sizeof(p)/sizeof(uint32_t); i++)
   { 
     if((x % p[i]) == 0)
     {
