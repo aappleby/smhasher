@@ -57,8 +57,8 @@ HashInfo g_hashes[] =
   { MurmurOAAT_test,      32, 0x5363BD98, "MurmurOAAT",  "Murmur one-at-a-time" },
   { Crap8_test,           32, 0x743E97A1, "Crap8",       "Crap8" },
 
-  { CityHash64_test,      64, 0x45754A6F, "City64",      "Google CityHash128WithSeed" },
-  { CityHash128_test,    128, 0x94B0EF46, "City128",     "Google CityHash128WithSeed" },
+  { CityHash64_test,      64, 0x25A20825, "City64",      "Google CityHash64WithSeed" },
+  { CityHash128_test,    128, 0x6531F54E, "City128",     "Google CityHash128WithSeed" },
   
   // MurmurHash2
 
