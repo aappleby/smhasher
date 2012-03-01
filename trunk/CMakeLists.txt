@@ -10,6 +10,7 @@ add_library(
   AvalancheTest.cpp
   Bitslice.cpp
   Bitvec.cpp
+  CityTest.cpp
   City.cpp
   crc.cpp
   DifferentialTest.cpp
@@ -24,6 +25,8 @@ add_library(
   Random.cpp
   sha1.cpp
   SpeedTest.cpp
+  Spooky.cpp
+  SpookyTest.cpp
   Stats.cpp
   SuperFastHash.cpp
   Types.cpp

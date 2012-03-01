@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-// CityHash Version 1, by Geoff Pike and Jyrki Alakuijala
+// CityHash, by Geoff Pike and Jyrki Alakuijala
 //
 // This file provides a few functions for hashing strings. On x86-64
 // hardware in 2011, CityHash64() is faster than other high-quality
@@ -43,15 +43,8 @@
 #ifndef CITY_HASH_H_
 #define CITY_HASH_H_
 
-#if defined(_MSC_VER) || defined(__CYGWIN__)
-#include "pstdint.h"
-typedef int ssize_t;
-#pragma warning(disable:4267)
-#else
-#include <stdint.h>
-#endif
-
 #include <stdlib.h>  // for size_t.
+#include <stdint.h>
 #include <utility>
 
 typedef uint8_t uint8;
@@ -93,5 +86,21 @@ inline uint64 Hash128to64(const uint128& x) {
   b *= kMul;
   return b;
 }
+
+// Conditionally include declarations for versions of City that require SSE4.2
+// instructions to be available.
+#ifdef __SSE4_2__
+
+// Hash function for a byte array.
+uint128 CityHashCrc128(const char *s, size_t len);
+
+// Hash function for a byte array.  For convenience, a 128-bit seed is also
+// hashed into the result.
+uint128 CityHashCrc128WithSeed(const char *s, size_t len, uint128 seed);
+
+// Hash function for a byte array.  Sets result[0] ... result[3].
+void CityHashCrc256(const char *s, size_t len, uint64 *result);
+
+#endif  // __SSE4_2__
 
 #endif  // CITY_HASH_H_

@@ -52,14 +52,19 @@ HashInfo g_hashes[] =
   { sha1_32a,             32, 0xF9376EA7, "sha1_32a",    "SHA1, first 32 bits of result" },
 
   { FNV,                  32, 0xE3CBBE91, "FNV",         "Fowler-Noll-Vo hash, 32-bit" },
+  { Bernstein,            32, 0xBDB4B640, "bernstein",   "Bernstein, 32-bit" },
   { lookup3_test,         32, 0x3D83917A, "lookup3",     "Bob Jenkins' lookup3" },
   { SuperFastHash,        32, 0x980ACD1D, "superfast",   "Paul Hsieh's SuperFastHash" },
   { MurmurOAAT_test,      32, 0x5363BD98, "MurmurOAAT",  "Murmur one-at-a-time" },
   { Crap8_test,           32, 0x743E97A1, "Crap8",       "Crap8" },
 
-  { CityHash64_test,      64, 0x45754A6F, "City64",      "Google CityHash128WithSeed" },
-  { CityHash128_test,    128, 0x94B0EF46, "City128",     "Google CityHash128WithSeed" },
-  
+  { CityHash64_test,      64, 0x25A20825, "City64",      "Google CityHash64WithSeed" },
+  { CityHash128_test,    128, 0x6531F54E, "City128",     "Google CityHash128WithSeed" },
+
+  { SpookyHash64_test,    32, 0x3F798BBB, "Spooky32",    "Bob Jenkins' SpookyHash, 32-bit result" },
+  { SpookyHash64_test,    64, 0xA7F955F1, "Spooky64",    "Bob Jenkins' SpookyHash, 64-bit result" },
+  { SpookyHash128_test,  128, 0x8D263080, "Spooky128",   "Bob Jenkins' SpookyHash, 128-bit result" },
+
   // MurmurHash2
 
   { MurmurHash2_test,     32, 0x27864C1E, "Murmur2",     "MurmurHash2 for x86, 32-bit" },
