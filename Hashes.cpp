@@ -119,16 +119,16 @@ uint32_t x17 ( const void * key, int len, uint32_t h )
 
 //-----------------------------------------------------------------------------
 
-uint32_t Bernstein ( const void * key, int len, uint32_t h ) 
+void Bernstein ( const void * key, int len, uint32_t seed, void * out ) 
 {
   const uint8_t * data = (const uint8_t*)key;
     
   for(int i = 0; i < len; ++i) 
   {
-        h = 33 * h + data[i];
+        seed = 33 * seed + data[i];
     }
 
-  return h;
+  *(uint32_t*)out = seed;
 }
 
 //-----------------------------------------------------------------------------

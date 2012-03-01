@@ -72,9 +72,18 @@ inline uint64_t rotr64 ( uint64_t x, int8_t r )
 
 __inline__ unsigned long long int rdtsc()
 {
+#ifdef __x86_64__
+    unsigned int a, d;
+    __asm__ volatile ("rdtsc" : "=a" (a), "=d" (d));
+    return (unsigned long)a | ((unsigned long)d << 32);
+#else
+#ifndef __i386__
+#error Must be x86 either 32-bit or 64-bit.
+#endif
     unsigned long long int x;
     __asm__ volatile ("rdtsc" : "=A" (x));
     return x;
+#endif
 }
 
 #include <strings.h>
