@@ -81,7 +81,7 @@ bool SanityTest ( pfHash hash, const int hashbits )
 
   const int hashbytes = hashbits/8;
   const int reps = 10;
-  const int keymax = 128;
+  const int keymax = 256;
   const int pad = 16;
   const int buflen = keymax + pad*3;
   

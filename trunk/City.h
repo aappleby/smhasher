@@ -43,8 +43,9 @@
 #ifndef CITY_HASH_H_
 #define CITY_HASH_H_
 
+#include "Platform.h"
 #include <stdlib.h>  // for size_t.
-#include <stdint.h>
+//#include <stdint.h>
 #include <utility>
 
 typedef uint8_t uint8;
