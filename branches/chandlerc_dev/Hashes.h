@@ -29,6 +29,7 @@ void sha1_32a              ( const void * key, int len, uint32_t seed, void * ou
 // General purpose hashes
 
 void FNV                   ( const void * key, int len, uint32_t seed, void * out );
+void Bernstein             ( const void * key, int len, uint32_t seed, void * out );
 void SuperFastHash         ( const void * key, int len, uint32_t seed, void * out );
 void lookup3_test          ( const void * key, int len, uint32_t seed, void * out );
 void MurmurOAAT_test       ( const void * key, int len, uint32_t seed, void * out );

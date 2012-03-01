@@ -52,6 +52,7 @@ HashInfo g_hashes[] =
   { sha1_32a,             32, 0xF9376EA7, "sha1_32a",    "SHA1, first 32 bits of result" },
 
   { FNV,                  32, 0xE3CBBE91, "FNV",         "Fowler-Noll-Vo hash, 32-bit" },
+  { Bernstein,            32, 0xBDB4B640, "bernstein",   "Bernstein, 32-bit" },
   { lookup3_test,         32, 0x3D83917A, "lookup3",     "Bob Jenkins' lookup3" },
   { SuperFastHash,        32, 0x980ACD1D, "superfast",   "Paul Hsieh's SuperFastHash" },
   { MurmurOAAT_test,      32, 0x5363BD98, "MurmurOAAT",  "Murmur one-at-a-time" },
