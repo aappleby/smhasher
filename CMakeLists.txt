@@ -29,6 +29,7 @@ add_library(
   Stats.cpp
   SuperFastHash.cpp
   Types.cpp
+  PMurHash.c
 )
 
 add_executable(
