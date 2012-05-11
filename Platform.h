@@ -76,13 +76,13 @@ __inline__ unsigned long long int rdtsc()
     unsigned int a, d;
     __asm__ volatile ("rdtsc" : "=a" (a), "=d" (d));
     return (unsigned long)a | ((unsigned long)d << 32);
-#else
-#ifndef __i386__
-#error Must be x86 either 32-bit or 64-bit.
-#endif
+#elif defined(__i386__)
     unsigned long long int x;
     __asm__ volatile ("rdtsc" : "=A" (x));
     return x;
+#else
+#define NO_CYCLE_COUNTER
+    return 0;
 #endif
 }
 

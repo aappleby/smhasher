@@ -146,6 +146,9 @@ bool SanityTest ( pfHash hash, const int hashbits )
     printf("PASS\n");
   }
 
+  delete [] buffer1;
+  delete [] buffer2;
+
   delete [] hash1;
   delete [] hash2;
 
