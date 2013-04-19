@@ -90,7 +90,7 @@ inline uint64 Hash128to64(const uint128& x) {
 
 // Conditionally include declarations for versions of City that require SSE4.2
 // instructions to be available.
-#ifdef __SSE4_2__
+#if defined(__SSE4_2__) && defined(__x86_64__)
 
 // Hash function for a byte array.
 uint128 CityHashCrc128(const char *s, size_t len);
