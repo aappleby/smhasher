@@ -376,18 +376,20 @@
 # define UINT32_MAX (0xffffffffUL)
 #endif
 #ifndef uint32_t
-#if (ULONG_MAX == UINT32_MAX) || defined (S_SPLINT_S)
-  typedef unsigned long uint32_t;
-# define UINT32_C(v) v ## UL
-# ifndef PRINTF_INT32_MODIFIER
-#  define PRINTF_INT32_MODIFIER "l"
-# endif
-#elif (UINT_MAX == UINT32_MAX)
+// Try the 'natural' int type first.
+// This is for compatibility with the stdint.h available on Windows.
+#if (UINT_MAX == UINT32_MAX) && !defined (S_SPLINT_S)
   typedef unsigned int uint32_t;
 # ifndef PRINTF_INT32_MODIFIER
 #  define PRINTF_INT32_MODIFIER ""
 # endif
 # define UINT32_C(v) v ## U
+#elif (ULONG_MAX == UINT32_MAX) || defined (S_SPLINT_S)
+  typedef unsigned long uint32_t;
+# define UINT32_C(v) v ## UL
+# ifndef PRINTF_INT32_MODIFIER
+#  define PRINTF_INT32_MODIFIER "l"
+# endif
 #elif (USHRT_MAX == UINT32_MAX)
   typedef unsigned short uint32_t;
 # define UINT32_C(v) ((unsigned short) (v))
@@ -406,17 +408,19 @@
 # define INT32_MIN INT32_C(0x80000000)
 #endif
 #ifndef int32_t
-#if (LONG_MAX == INT32_MAX) || defined (S_SPLINT_S)
-  typedef signed long int32_t;
-# define INT32_C(v) v ## L
-# ifndef PRINTF_INT32_MODIFIER
-#  define PRINTF_INT32_MODIFIER "l"
-# endif
-#elif (INT_MAX == INT32_MAX)
+// Try the 'natural' int type first.
+// This is for compatibility with the stdint.h available on Windows.
+#if (INT_MAX == INT32_MAX) && !defined (S_SPLINT_S)
   typedef signed int int32_t;
 # define INT32_C(v) v
 # ifndef PRINTF_INT32_MODIFIER
 #  define PRINTF_INT32_MODIFIER ""
+# endif
+#elif (LONG_MAX == INT32_MAX) || defined (S_SPLINT_S)
+  typedef signed long int32_t;
+# define INT32_C(v) v ## L
+# ifndef PRINTF_INT32_MODIFIER
+#  define PRINTF_INT32_MODIFIER "l"
 # endif
 #elif (SHRT_MAX == INT32_MAX)
   typedef signed short int32_t;
