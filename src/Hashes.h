@@ -5,6 +5,7 @@
 #include "MurmurHash1.h"
 #include "MurmurHash2.h"
 #include "MurmurHash3.h"
+#include "xxhash.h"
 
 //----------
 // These are _not_ hash functions (even though people tend to use crc32 as one...)
@@ -18,6 +19,9 @@ void crc32                 ( const void * key, int len, uint32_t seed, void * ou
 void randhash_32           ( const void * key, int len, uint32_t seed, void * out );
 void randhash_64           ( const void * key, int len, uint32_t seed, void * out );
 void randhash_128          ( const void * key, int len, uint32_t seed, void * out );
+
+void xxhash_32             ( const void * key, int len, uint32_t seed, void * out );
+void xxhash_64             ( const void * key, int len, uint32_t seed, void * out );
 
 //----------
 // Cryptographic hashes
@@ -75,4 +79,14 @@ inline void MurmurHash64A_test ( const void * key, int len, uint32_t seed, void 
 inline void MurmurHash64B_test ( const void * key, int len, uint32_t seed, void * out )
 {
   *(uint64_t*)out = MurmurHash64B(key,len,seed);
+}
+
+inline void xxhash_32 ( const void * key, int len, uint32_t seed, void * out )
+{
+  *(uint64_t*)out = XXH32(key,len,seed);
+}
+
+inline void xxhash_64 ( const void * key, int len, uint32_t seed, void * out )
+{
+  *(uint64_t*)out = XXH64(key,len,seed);
 }
