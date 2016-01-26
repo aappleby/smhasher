@@ -49,6 +49,9 @@ HashInfo g_hashes[] =
 
   { crc32,                32, 0x3719DB20, "crc32",       "CRC-32" },
 
+  { xxhash_32,            32, 0xBA88B743, "xxHash32",    "xxHash, 32-bit" },
+  { xxhash_64,            64, 0x024B7CF4, "xxHash64",    "xxHash, 64-bit" },
+
   { md5_32,               32, 0xC10C356B, "md5_32a",     "MD5, first 32 bits of result" },
   { sha1_32a,             32, 0xF9376EA7, "sha1_32a",    "SHA1, first 32 bits of result" },
 
