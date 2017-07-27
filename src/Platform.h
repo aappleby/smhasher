@@ -88,11 +88,13 @@ __inline__ unsigned long long int rdtsc()
 
 #if defined(_Windows)
 	#include <string>
+	#define _stricmp stricmp
 #else
 	#include <strings.h>
+	#define _stricmp strcasecmp
 #endif
 
-#define _stricmp strcasecmp
+
 
 #endif	//	!defined(_MSC_VER)
 
