@@ -5,7 +5,7 @@
 #include "AvalancheTest.h"
 #include "DifferentialTest.h"
 #include "PMurHash.h"
-
+#include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
 
