@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{05F02572-F4E4-4CA5-A155-A080C6E9792C}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="SMHasher.cbproj">
+            <Dependencies>SMHasherSupport.cbproj</Dependencies>
+        </Projects>
+        <Projects Include="SMHasherSupport.cbproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="SMHasher" DependsOnTargets="SMHasherSupport">
+        <MSBuild Projects="SMHasher.cbproj"/>
+    </Target>
+    <Target Name="SMHasher:Clean" DependsOnTargets="SMHasherSupport:Clean">
+        <MSBuild Projects="SMHasher.cbproj" Targets="Clean"/>
+    </Target>
+    <Target Name="SMHasher:Make" DependsOnTargets="SMHasherSupport:Make">
+        <MSBuild Projects="SMHasher.cbproj" Targets="Make"/>
+    </Target>
+    <Target Name="SMHasherSupport">
+        <MSBuild Projects="SMHasherSupport.cbproj"/>
+    </Target>
+    <Target Name="SMHasherSupport:Clean">
+        <MSBuild Projects="SMHasherSupport.cbproj" Targets="Clean"/>
+    </Target>
+    <Target Name="SMHasherSupport:Make">
+        <MSBuild Projects="SMHasherSupport.cbproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="SMHasher;SMHasherSupport"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="SMHasher:Clean;SMHasherSupport:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="SMHasher:Make;SMHasherSupport:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
