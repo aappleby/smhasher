@@ -1,0 +1,7 @@
+set(CMAKE_SYSTEM_NAME Win64)
+set(CMAKE_C_COMPILER C:/Program\ Files\ \(x86\)/Embarcadero/Studio/19.0/bin/bcc64.exe)
+set(CMAKE_CXX_COMPILER C:/Program\ Files\ \(x86\)/Embarcadero/Studio/19.0/bin/bcc64.exe)
+set(CMAKE_AR C:/Program\ Files\ \(x86\)/Embarcadero/Studio/19.0/bin/tlib64.exe CACHE FILEPATH "Archiver")
+set(CMAKE_RANLIB C:/Program\ Files\ \(x86\)/Embarcadero/Studio/19.0/bin/tlib64.exe)
+set(CMAKE_C_ARCHIVE_CREATE "<CMAKE_AR> /a <TARGET> <LINK_FLAGS> <OBJECTS>")
+set(CMAKE_CXX_ARCHIVE_CREATE "<CMAKE_AR> /a <TARGET> <LINK_FLAGS> <OBJECTS>")

@@ -9,7 +9,7 @@ void testRDTSC ( void )
   printf("%d",(int)temp);
 }
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) || defined(_Windows)
 
 #include <windows.h>
 
