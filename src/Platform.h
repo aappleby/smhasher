@@ -86,8 +86,7 @@ __inline__ unsigned long long int rdtsc()
 #endif
 }
 
-#if defined(_Windows)
-	#include <string>
+#if defined (_MSC_VER) || defined(_Windows)
 	#define _stricmp stricmp
 #else
 	#include <strings.h>
