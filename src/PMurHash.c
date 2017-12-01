@@ -73,6 +73,12 @@ on big endian machines, or a byte-by-byte read if the endianess is unknown.
  * UNALIGNED_SAFE   Defined if READ_UINT32 works on non-word boundaries
  * ROTL32(x,r)      Rotate x left by r bits
  */
+	
+#if defined(__GNUC__)
+  #define __BIG_ENDIAN __ORDER_BIG_ENDIAN__
+  #define __LITTLE_ENDIAN __ORDER_LITTLE_ENDIAN__
+  #define __BYTE_ORDER __BYTE_ORDER__
+#endif
 
 /* Convention is to define __BYTE_ORDER == to one of these values */
 #if !defined(__BIG_ENDIAN)
