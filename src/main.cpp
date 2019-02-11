@@ -7,6 +7,7 @@
 #include "PMurHash.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <time.h>
 
 //-----------------------------------------------------------------------------
@@ -28,6 +29,98 @@ bool g_testWindow      = false;
 bool g_testText        = false;
 bool g_testZeroes      = false;
 bool g_testSeed        = false;
+
+bool g_testSelected    = false;
+
+//-----------------------------------------------------------------------------
+// Support functions for command-line flag
+static const char *clGet (int argc, char **argv, const char *name)
+{
+  for (size_t i=1; i<argc; i++) {
+
+    if ((memcmp (argv[i], "--", 2))!=0)
+      continue;
+
+    if ((memcmp (&argv[i][2], name, strlen (name) + 1))==0) {
+      char *value = strchr (&argv[i][2], '=');
+      if (value) {
+        *value++ = 0;
+        return value;
+      } else {
+        return "";
+      }
+    }
+  }
+
+  return NULL;
+}
+
+static void print_help_msg (void)
+{
+  static const char *msg[] = {
+"SMHasher [options]:",
+"",
+"--help              This message, then exit.",
+"--hash=<hash_name>  The name of the hash to test (default murmur3a).",
+"--list-hashes       List supported hashes for '--hash', then exit.",
+"--test-all          Run all tests.",
+"--test-sanity       Run sanity test.",
+"--test-speed        Run speed test.",
+"--test-diff         Run differential test.",
+"--test-diff-dist    Run differential distribution test.",
+"--test-avalanche    Run avalanche test.",
+"--test-bic          Run bit-independent-criteria test.",
+"--test-cyclic       Run keyset cyclic test.",
+"--test-two-bytes    Run keyset two-bytes test.",
+"--test-sparse       Run keyset sparse test.",
+"--test-permutation  Run keyset permutation test.",
+"--test-window       Run keyset window test.",
+"--test-text         Run keyset text test.",
+"--test-zeroes       Run keyset zeros test.",
+"--test-seed         Run keyset seed test.",
+"",
+  };
+
+  for (size_t i=0; i<sizeof msg/sizeof msg[0]; i++) {
+    printf ("%s\n", msg[i]);
+  }
+}
+
+static void setFlags (int argc, char **argv)
+{
+  static const struct {
+    bool *flag;
+    const char *name;
+  } flags[] = {
+    { &g_testAll,           "test-all"           },
+    { &g_testSanity,        "test-sanity"        },
+    { &g_testSpeed,         "test-speed"         },
+    { &g_testDiff,          "test-diff"          },
+    { &g_testDiffDist,      "test-diff-dist"     },
+    { &g_testAvalanche,     "test-avalanche"     },
+    { &g_testBIC,           "test-bic"           },
+    { &g_testCyclic,        "test-cyclic"        },
+    { &g_testTwoBytes,      "test-two-bytes"     },
+    { &g_testSparse,        "test-sparse"        },
+    { &g_testPermutation,   "test-permutation"   },
+    { &g_testWindow,        "test-window"        },
+    { &g_testText,          "test-text"          },
+    { &g_testZeroes,        "test-zeroes"        },
+    { &g_testSeed,          "test-seed"          },
+  };
+
+  g_testSelected = false;
+
+  for (size_t i=0; i<sizeof flags / sizeof flags[0]; i++) {
+    if ((clGet (argc, argv, flags[i].name)) != NULL) {
+      (*flags[i].flag) = true;
+      printf ("Setting [%s]\n", flags[i].name);
+      g_testSelected = true;
+    } else {
+      (*flags[i].flag) = false;
+    }
+  }
+}
 
 //-----------------------------------------------------------------------------
 // This is the list of all hashes that SMHasher can test.
@@ -549,15 +642,34 @@ void testHash ( const char * name )
 
 int main ( int argc, char ** argv )
 {
-  const char * hashToTest = "murmur3a";
+  const char * hashToTest;
 
-  if(argc < 2)
-  {
-    printf("(No test hash given on command line, testing Murmur3_x86_32.)\n");
+  // Process the options that cause us to exit early
+  if (clGet (argc, argv, "help")) {
+    print_help_msg ();
+    return EXIT_SUCCESS;
   }
-  else
-  {
-    hashToTest = argv[1];
+
+  if (clGet (argc, argv, "list-hashes")) {
+    printf ("Supported hashes. Use as hash_name in '--hash=<hash_name>'\n");
+    for (size_t i = 0; i < sizeof g_hashes / sizeof g_hashes[0]; i++) {
+      printf ("    %s\n", g_hashes[i].name);
+    }
+    return EXIT_SUCCESS;
+  }
+
+  // Determine if we use the default hash or if the user specified a hash.
+  // (The actual test checks if the hash name is valid - we don't need to
+  // do that here).
+  const char *specifiedHash = clGet (argc, argv, "hash");
+  hashToTest = specifiedHash==NULL ? "murmur3a" : specifiedHash;
+  printf ("Testing hash [%s]\n", hashToTest);
+
+  // Set all the flags, and exit if user did not specify a test flag.
+  setFlags (argc, argv);
+  if (g_testSelected == false) {
+    printf ("No test selected. Try \n     %s --help\n", argv[0]);
+    return EXIT_FAILURE;
   }
 
   // Code runs on the 3rd CPU by default
@@ -568,7 +680,7 @@ int main ( int argc, char ** argv )
 
   int timeBegin = clock();
 
-  g_testAll = true;
+  // g_testAll = true;
 
   //g_testSanity = true;
   //g_testSpeed = true;
