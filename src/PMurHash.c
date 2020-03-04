@@ -88,6 +88,12 @@ on big endian machines, or a byte-by-byte read if the endianess is unknown.
   #define UNALIGNED_SAFE
 #endif
 
+/* X86-64 */
+#if defined(_M_X64) || defined(__x86_64__)
+  #define __BYTE_ORDER __LITTLE_ENDIAN
+  #define UNALIGNED_SAFE
+#endif
+
 /* gcc 'may' define __LITTLE_ENDIAN__ or __BIG_ENDIAN__ to 1 (Note the trailing __),
  * or even _LITTLE_ENDIAN or _BIG_ENDIAN (Note the single _ prefix) */
 #if !defined(__BYTE_ORDER)
