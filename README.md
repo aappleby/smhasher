@@ -7,9 +7,18 @@ SMHasher is a test suite designed to test the distribution, collision, and perfo
 The SMHasher suite also includes [MurmurHash3](https://github.com/aappleby/smhasher/blob/master/src/MurmurHash3.cpp), which is the latest version in the series of MurmurHash functions - the new version is faster, more robust, and its variants can produce 32- and 128-bit hash values efficiently on both x86 and x64 platforms.
 
 
+## Build instructions
+
+See [build/README.md](build/README.md).
+
+
 ## Updates
 
-### 1/8/2016
+### 5/15/2021
+
+Add build instructions.
+
+### 1/08/2016
 
 Woo, we're on Github! I've been putting off the migration for a few, uh, years or so, but hopefully Github won't be shutting down any time soon so I don't have to move things again. MurmurHash is still used all over the place, SMHasher is still the defacto hash function test suite, and there are all sorts of interesting new hash functions out there that improve bulk hashing speed and use new shiny hardware instructions for AES and whatnot. Interesting times. :)
 
