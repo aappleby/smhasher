@@ -1,0 +1,4 @@
+# Exclude contents of the build dir
+/build/*
+# But DO include its readme
+!/build/README.md

@@ -1,0 +1,4 @@
+mkdir build
+cmake ../src
+
+
