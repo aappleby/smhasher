@@ -1,6 +1,6 @@
 ## [SMHasher](https://github.com/aappleby/smhasher/wiki) is a test suite designed to test the distribution, collision, and performance properties of non-cryptographic hash functions.
 
-("Non-cryptographic" means that these hash functions are intended to be used in hash tables, such as C++'s [`std::unordered_map<>`](https://en.cppreference.com/w/cpp/container/unordered_map) template container, or in any hash tables you might choose to implement in C. They can also be used for data integrity checks, but again, are not designed to be used in, nor tested for robustness in cryptography, including for encryption or authentication). 
+("Non-cryptographic" means that these hash functions are intended to be used in hash tables, such as C++'s [`std::unordered_map<>`](https://en.cppreference.com/w/cpp/container/unordered_map) template container, or in any hash tables you might choose to implement in C. They can also be used for data integrity checks, but again, are not designed to be used in, nor are they tested for robustness in cryptography, whether for encryption or authentication or something else). 
 
 This is the home for the [MurmurHash](https://github.com/aappleby/smhasher/tree/master/src) family of hash functions along with the [SMHasher](https://github.com/aappleby/smhasher/tree/master/src) test suite used to verify them. SMHasher is released under the MIT license. All MurmurHash versions are public domain software, and the author disclaims all copyright to their code.
 
