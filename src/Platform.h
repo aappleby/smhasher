@@ -3,6 +3,13 @@
 
 #pragma once
 
+extern "C" {
+
+#include <sys/time.h>
+#include <time.h>
+
+} // extern "C"
+
 void SetAffinity ( int cpu );
 
 //-----------------------------------------------------------------------------
@@ -70,6 +77,11 @@ inline uint64_t rotr64 ( uint64_t x, int8_t r )
 
 #define BIG_CONSTANT(x) (x##LLU)
 
+#define NSECS_IN_USEC 1000
+#define USECS_IN_SEC (1000 * 1000)
+#define NSECS_IN_SEC (USECS_IN_SEC * NSECS_IN_USEC)
+extern uint64_t g_tsc_hz;
+
 __inline__ unsigned long long int rdtsc()
 {
 #ifdef __x86_64__
@@ -81,8 +93,12 @@ __inline__ unsigned long long int rdtsc()
     __asm__ volatile ("rdtsc" : "=A" (x));
     return x;
 #else
-#define NO_CYCLE_COUNTER
-    return 0;
+    struct timespec tmp;
+    clock_gettime(CLOCK_MONOTONIC, &tmp);
+    return tmp.tv_sec * g_tsc_hz +
+           (uint64_t) tmp.tv_nsec * g_tsc_hz / NSECS_IN_SEC;
+//#define NO_CYCLE_COUNTER
+//    return 0;
 #endif
 }
 

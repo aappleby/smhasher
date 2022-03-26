@@ -80,6 +80,10 @@ HashInfo g_hashes[] =
   { MurmurHash3_x64_128, 128, 0x6384BA69, "Murmur3F",    "MurmurHash3 for x64, 128-bit" },
 
   { PMurHash32_test,      32, 0xB0F57EE3, "PMurHash32",  "Shane Day's portable-ized MurmurHash3 for x86, 32-bit." },
+
+  // crc32c with cpu acceleration
+  { crc32_cpu, 32, 0x94BA1479, "crc32-cpu", "google crc32c"},
+  { highway_hash, 64, 0x5495E9AA, "highway", "google highway hash"},
 };
 
 HashInfo * findHash ( const char * name )
@@ -568,20 +572,20 @@ int main ( int argc, char ** argv )
 
   int timeBegin = clock();
 
-  g_testAll = true;
+  g_testAll = false;
 
-  //g_testSanity = true;
-  //g_testSpeed = true;
-  //g_testAvalanche = true;
+//  g_testSanity = true;
+  g_testSpeed = true;
+//  g_testAvalanche = true;
   //g_testBIC = true;
   //g_testCyclic = true;
   //g_testTwoBytes = true;
   //g_testDiff = true;
   //g_testDiffDist = true;
-  //g_testSparse = true;
+//  g_testSparse = true;
   //g_testPermutation = true;
   //g_testWindow = true;
-  //g_testZeroes = true;
+//  g_testZeroes = true;
 
   testHash(hashToTest);
 

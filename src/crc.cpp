@@ -1,5 +1,8 @@
 #include "Platform.h"
 
+#include "crc32c/crc32c.h"
+#include "highwayhash/c_bindings.h"
+
 /*
  * This file is derived from crc32.c from the zlib-1.1.3 distribution
  * by Jean-loup Gailly and Mark Adler.
@@ -92,9 +95,26 @@ void crc32 ( const void * key, int len, uint32_t seed, void * out )
   while(len--)
   {
     DO1(buf);
-  } 
+  }
 
   crc ^= 0xffffffffL;
 
   *(uint32_t*)out = crc;
+}
+
+void crc32_cpu ( const void * key, int len, uint32_t seed, void * out)
+{
+    uint8_t * buf = (uint8_t*)key;
+    uint32_t crc = seed ^ 0xffffffffL;
+
+    *(uint32_t*)out = crc32c::Extend(crc, buf, len);
+}
+
+void highway_hash ( const void * key, int len, uint32_t seed, void * out)
+{
+    const char * buf = (const char*) key;
+    const uint32_t crc = seed ^ 0xffffffffL;
+    const uint64_t hkey[4] = {1, 2, 3, 4};
+
+    *(int64_t*)out = HighwayHash64(hkey, buf, len);
 }

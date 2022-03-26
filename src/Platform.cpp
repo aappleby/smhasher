@@ -2,6 +2,8 @@
 
 #include <stdio.h>
 
+uint64_t g_tsc_hz = 3000;// fixed set to 3000 mhz on arm
+
 void testRDTSC ( void )
 {
   int64_t temp = rdtsc();
@@ -27,11 +29,11 @@ void SetAffinity ( int /*cpu*/ )
 {
 #if !defined(__CYGWIN__) && !defined(__APPLE__)
   cpu_set_t mask;
-    
+
   CPU_ZERO(&mask);
-    
+
   CPU_SET(2,&mask);
-    
+
   if( sched_setaffinity(0,sizeof(mask),&mask) == -1)
   {
     printf("WARNING: Could not set CPU affinity\n");

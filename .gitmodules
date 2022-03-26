@@ -1,0 +1,6 @@
+[submodule "src/3rd-party/crc32c"]
+	path = src/3rd-party/crc32c
+	url = https://github.com/google/crc32c.git
+[submodule "src/3rd-party/highwayhash"]
+	path = src/3rd-party/highwayhash
+	url = https://github.com/google/highwayhash.git
