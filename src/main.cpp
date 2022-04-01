@@ -6,8 +6,11 @@
 #include "DifferentialTest.h"
 #include "PMurHash.h"
 
-#include <stdio.h>
-#include <time.h>
+#include <cstdio>
+#include <ctime>
+
+#include <iostream>
+#include <filesystem>
 
 //-----------------------------------------------------------------------------
 // Configuration. TODO - move these to command-line flags
@@ -82,7 +85,9 @@ HashInfo g_hashes[] =
   { PMurHash32_test,      32, 0xB0F57EE3, "PMurHash32",  "Shane Day's portable-ized MurmurHash3 for x86, 32-bit." },
 
   // crc32c with cpu acceleration
-  { crc32_cpu, 32, 0x94BA1479, "crc32-cpu", "google crc32c"},
+  { crc32_cpu, 32, 0x6E6071BD, "crc32-cpu", "google crc32c"},
+  { crc32_pg, 32, 0x6E6071BD, "crc32-pg", "postgres crc32c"},
+  { crc32_chrom, 32, 0x3719DB20, "crc32-chrom", "chromium crc32c"},
   { highway_hash, 64, 0x5495E9AA, "highway", "google highway hash"},
 };
 
@@ -124,6 +129,31 @@ void SelfTest ( void )
 
     exit(1);
   }
+//
+//  int tmp = 1234568;
+//  size_t len = 4;
+//  char *buffer = (char*)&tmp;
+//
+//
+//  len = std::filesystem::file_size("./SMHasher");
+//  FILE *fd = fopen("./SMHasher", "r");
+//
+//  buffer = (char*) malloc(len);
+//  fread(buffer, 1, len, fd);
+//
+//  uint32_t crc32c_soft = 0;
+//  crc32(buffer, len, crc32c_soft, &crc32c_soft);
+//  uint32_t crc32c_pg = 0;
+//  crc32_pg(buffer, len,crc32c_pg, &crc32c_pg);
+//  uint32_t crc32c_chrom = 0;
+//  crc32_chrom(buffer, len,crc32c_chrom, &crc32c_chrom);
+//  uint32_t crc32c_google = 0;
+//  crc32_cpu(buffer, len, crc32c_google, &crc32c_google);
+//
+//    std::cout<<std::hex<<" crc32c_soft="<<crc32c_soft<<std::endl
+//             <<" crc32c_pg="<<crc32c_pg<<std::endl
+//             <<" crc32c_chrom="<<crc32c_chrom<<std::endl
+//             <<" crc32c_google="<<crc32c_google<<std::endl;
 }
 
 //----------------------------------------------------------------------------
@@ -155,8 +185,17 @@ void test ( hashfunc<hashtype> hash, HashInfo * info )
   if(g_testSpeed || g_testAll)
   {
     printf("[[[ Speed Tests ]]]\n\n");
+//
+//    int psize = 4096;
+//    std::vector<int> sizes = {512, 1024, psize, psize*2, psize*4, psize*10, psize*30, psize*512};
+//
+//    for (auto size : sizes) {
+//        std::cout<<"  EEDY speed test on size:"<<size<<std::endl;
+//        BulkSpeedTest(info->hash, info->verification, size);
+//        printf("\n");
+//    }
 
-    BulkSpeedTest(info->hash,info->verification);
+    BulkSpeedTest(info->hash, info->verification);
     printf("\n");
 
     for(int i = 1; i < 32; i++)
@@ -577,14 +616,14 @@ int main ( int argc, char ** argv )
 //  g_testSanity = true;
   g_testSpeed = true;
 //  g_testAvalanche = true;
-  //g_testBIC = true;
-  //g_testCyclic = true;
-  //g_testTwoBytes = true;
-  //g_testDiff = true;
-  //g_testDiffDist = true;
+//  g_testBIC = true;
+//  g_testCyclic = true;
+//  g_testTwoBytes = true;
+//  g_testDiff = true;
+//  g_testDiffDist = true;
 //  g_testSparse = true;
-  //g_testPermutation = true;
-  //g_testWindow = true;
+//  g_testPermutation = true;
+//  g_testWindow = true;
 //  g_testZeroes = true;
 
   testHash(hashToTest);

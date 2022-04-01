@@ -33,9 +33,11 @@
 #ifndef PG_CRC32C_H
 #define PG_CRC32C_H
 
-#include "port/pg_bswap.h"
+//#include "port/pg_bswap.h"
+#include <stddef.h>
 
-typedef uint32 pg_crc32c;
+//typedef uint32 pg_crc32c;
+typedef unsigned int pg_crc32c;
 
 /* The INIT and EQ macros are the same for all implementations. */
 #define INIT_CRC32C(crc) ((crc) = 0xFFFFFFFF)
@@ -44,7 +46,7 @@ typedef uint32 pg_crc32c;
 #if defined(USE_SSE42_CRC32C)
 /* Use Intel SSE4.2 instructions. */
 #define COMP_CRC32C(crc, data, len) \
-	((crc) = pg_comp_crc32c_sse42((crc), (data), (len)))
+    ((crc) = pg_comp_crc32c_sse42((crc), (data), (len)))
 #define FIN_CRC32C(crc) ((crc) ^= 0xFFFFFFFF)
 
 extern pg_crc32c pg_comp_crc32c_sse42(pg_crc32c crc, const void *data, size_t len);
@@ -53,7 +55,7 @@ extern pg_crc32c pg_comp_crc32c_sse42(pg_crc32c crc, const void *data, size_t le
 /* Use ARMv8 CRC Extension instructions. */
 
 #define COMP_CRC32C(crc, data, len)							\
-	((crc) = pg_comp_crc32c_armv8((crc), (data), (len)))
+    ((crc) = pg_comp_crc32c_armv8((crc), (data), (len)))
 #define FIN_CRC32C(crc) ((crc) ^= 0xFFFFFFFF)
 
 extern pg_crc32c pg_comp_crc32c_armv8(pg_crc32c crc, const void *data, size_t len);
@@ -65,7 +67,7 @@ extern pg_crc32c pg_comp_crc32c_armv8(pg_crc32c crc, const void *data, size_t le
  * to check that they are available.
  */
 #define COMP_CRC32C(crc, data, len) \
-	((crc) = pg_comp_crc32c((crc), (data), (len)))
+    ((crc) = pg_comp_crc32c((crc), (data), (len)))
 #define FIN_CRC32C(crc) ((crc) ^= 0xFFFFFFFF)
 
 extern pg_crc32c pg_comp_crc32c_sb8(pg_crc32c crc, const void *data, size_t len);
@@ -87,7 +89,7 @@ extern pg_crc32c pg_comp_crc32c_armv8(pg_crc32c crc, const void *data, size_t le
  * the bytes to the final order.
  */
 #define COMP_CRC32C(crc, data, len) \
-	((crc) = pg_comp_crc32c_sb8((crc), (data), (len)))
+    ((crc) = pg_comp_crc32c_sb8((crc), (data), (len)))
 #ifdef WORDS_BIGENDIAN
 #define FIN_CRC32C(crc) ((crc) = pg_bswap32(crc) ^ 0xFFFFFFFF)
 #else

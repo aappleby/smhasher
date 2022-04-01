@@ -1,6 +1,8 @@
 #include "Platform.h"
 
 #include "crc32c/crc32c.h"
+#include "crc32c_pg/pg_crc32c.h"
+#include "crc32_chromium/crc32_simd.h"
 #include "highwayhash/c_bindings.h"
 
 /*
@@ -105,9 +107,37 @@ void crc32 ( const void * key, int len, uint32_t seed, void * out )
 void crc32_cpu ( const void * key, int len, uint32_t seed, void * out)
 {
     uint8_t * buf = (uint8_t*)key;
+    uint32_t crc = seed ;
+
+    crc = crc32c::Extend(crc, buf, len);
+
+//    crc ^= 0xffffffffL;
+
+    *(uint32_t*)out = crc;
+}
+
+void crc32_pg ( const void * key, int len, uint32_t seed, void * out)
+{
+    uint8_t * buf = (uint8_t*)key;
     uint32_t crc = seed ^ 0xffffffffL;
 
-    *(uint32_t*)out = crc32c::Extend(crc, buf, len);
+    COMP_CRC32C(crc, buf, len);
+
+    crc ^= 0xffffffffL;
+
+    *(uint32_t*)out = crc;
+}
+
+void crc32_chrom ( const void * key, int len, uint32_t seed, void * out)
+{
+    uint8_t * buf = (uint8_t*)key;
+    uint32_t crc = seed ;
+
+    COMP_CRC32C_CHROMIUM(crc, buf, len);
+
+//    crc ^= 0xffffffffL;
+
+    *(uint32_t*)out = crc;
 }
 
 void highway_hash ( const void * key, int len, uint32_t seed, void * out)

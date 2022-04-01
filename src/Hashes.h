@@ -15,6 +15,8 @@ void sumhash32             ( const void * key, int len, uint32_t seed, void * ou
 void DoNothingHash         ( const void * key, int len, uint32_t seed, void * out );
 void crc32                 ( const void * key, int len, uint32_t seed, void * out );
 void crc32_cpu             ( const void * key, int len, uint32_t seed, void * out );
+void crc32_pg              ( const void * key, int len, uint32_t seed, void * out );
+void crc32_chrom           ( const void * key, int len, uint32_t seed, void * out );
 void highway_hash          ( const void * key, int len, uint32_t seed, void * out );
 
 void randhash_32           ( const void * key, int len, uint32_t seed, void * out );

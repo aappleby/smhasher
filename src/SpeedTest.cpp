@@ -150,7 +150,7 @@ void FilterOutliers2 ( std::vector<double> & v )
 
 NEVER_INLINE int64_t timehash ( pfHash hash, const void * key, int len, int seed )
 {
-  volatile register int64_t begin,end;
+  volatile  int64_t begin,end;
 
   uint32_t temp[16];
 
@@ -208,10 +208,14 @@ double SpeedTest ( pfHash hash, uint32_t seed, const int trials, const int block
 //-----------------------------------------------------------------------------
 // 256k blocks seem to give the best results.
 
-void BulkSpeedTest ( pfHash hash, uint32_t seed )
+void BulkSpeedTest ( pfHash hash, uint32_t seed , int size)
 {
   const int trials = 2999;
-  const int blocksize = 256 * 1024 * 32;
+//  const int blocksize = 256 * 1024 * 32;
+  int blocksize = 256 * 1024 * 32;
+  if (size > 0)
+      blocksize = size;
+
 
   printf("Bulk speed test - %d-byte keys\n",blocksize);
 
