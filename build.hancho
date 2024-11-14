@@ -1,0 +1,9 @@
+import glob
+
+hancho.base_rules = hancho.repo("{hancho_dir}/base_rules.hancho")
+
+smhasher = hancho(
+    hancho.base_rules.cpp_bin,
+    in_srcs = glob.glob("src/*.cpp") + glob.glob("src/*.c"),
+    out_bin = "smhasher",
+)
