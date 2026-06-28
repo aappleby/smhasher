@@ -15,13 +15,14 @@
  * any version provided by the system headers or application. */
 
 /* First look for special cases */
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && _MSC_VER < 1600
   #define MH_UINT32 unsigned long
 #endif
 
 /* If the compiler says it's C99 then take its word for it */
 #if !defined(MH_UINT32) && ( \
-     defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L )
+     (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) || \
+     (defined(_MSC_VER) && _MSC_VER >= 1600) )
   #include <stdint.h>
   #define MH_UINT32 uint32_t
 #endif
