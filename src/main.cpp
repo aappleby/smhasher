@@ -68,10 +68,17 @@ HashInfo g_hashes[] =
 
   // MurmurHash2
 
+#if defined(__PPC64__) && defined (__LITTLE_ENDIAN__)
+  { MurmurHash2_test,     32, 0x27864C1E, "Murmur2",     "MurmurHash2 for ppc64le, 32-bit" },
+  { MurmurHash2A_test,    32, 0x7FBD4396, "Murmur2A",    "MurmurHash2A for ppc64le, 32-bit" },
+  { MurmurHash64A_test,   64, 0x1F0D3804, "Murmur2B",    "MurmurHash2 for ppc64le, 64-bit" },
+  { MurmurHash64B_test,   64, 0xDD537C05, "Murmur2C",    "MurmurHash2 for ppc64le, 64-bit" },
+#else
   { MurmurHash2_test,     32, 0x27864C1E, "Murmur2",     "MurmurHash2 for x86, 32-bit" },
   { MurmurHash2A_test,    32, 0x7FBD4396, "Murmur2A",    "MurmurHash2A for x86, 32-bit" },
   { MurmurHash64A_test,   64, 0x1F0D3804, "Murmur2B",    "MurmurHash2 for x64, 64-bit" },
   { MurmurHash64B_test,   64, 0xDD537C05, "Murmur2C",    "MurmurHash2 for x86, 64-bit" },
+#endif /* PPC64 && LITTLE_ENDIAN */
 
   // MurmurHash3
 
@@ -562,7 +569,9 @@ int main ( int argc, char ** argv )
 
   // Code runs on the 3rd CPU by default
 
+#if !defined (__PPC64__) && !defined (__LITTLE_ENDIAN__)
   SetAffinity((1 << 2));
+#endif /* PPC64 && LITTLE_ENDIAN */
 
   SelfTest();
 

@@ -80,6 +80,11 @@ __inline__ unsigned long long int rdtsc()
     unsigned long long int x;
     __asm__ volatile ("rdtsc" : "=A" (x));
     return x;
+#elif defined(__PPC64__) && defined(__LITTLE_ENDIAN__) && \
+    ( __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 8)) 
+    unsigned long long int val;
+    val = __builtin_ppc_get_timebase();
+    return val;
 #else
 #define NO_CYCLE_COUNTER
     return 0;

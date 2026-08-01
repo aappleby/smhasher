@@ -8,8 +8,13 @@
  */
 typedef struct
 {
+#if defined(__PPC64__) && defined (__LITTLE_ENDIAN__)
+    unsigned int total[2];     /*!< number of bytes processed  */
+    unsigned int state[4];     /*!< intermediate digest state  */
+#else
     unsigned long total[2];     /*!< number of bytes processed  */
     unsigned long state[4];     /*!< intermediate digest state  */
+#endif /* PPC64 && LITTLE_ENDIAN */
     unsigned char buffer[64];   /*!< data block being processed */
 
     unsigned char ipad[64];     /*!< HMAC: inner padding        */
@@ -146,7 +151,11 @@ void md5_starts( md5_context *ctx )
 
 static void md5_process( md5_context *ctx, unsigned char data[64] )
 {
+#if defined(__PPC64__) && defined (__LITTLE_ENDIAN__)
+    unsigned int X[16], A, B, C, D;
+#else
     unsigned long X[16], A, B, C, D;
+#endif /* PPC64 && LITTLE_ENDIAN */
 
     GET_ULONG_LE( X[ 0], data,  0 );
     GET_ULONG_LE( X[ 1], data,  4 );
@@ -273,7 +282,11 @@ static void md5_process( md5_context *ctx, unsigned char data[64] )
 void md5_update( md5_context *ctx, unsigned char *input, int ilen )
 {
     int fill;
+#if defined(__PPC64__) && defined (__LITTLE_ENDIAN__)
+    unsigned int left;
+#else
     unsigned long left;
+#endif /* PPC64 && LITTLE_ENDIAN */
 
     if( ilen <= 0 )
         return;
@@ -284,7 +297,11 @@ void md5_update( md5_context *ctx, unsigned char *input, int ilen )
     ctx->total[0] += ilen;
     ctx->total[0] &= 0xFFFFFFFF;
 
+#if defined(__PPC64__) && defined (__LITTLE_ENDIAN__)
+    if( ctx->total[0] < (unsigned int) ilen )
+#else
     if( ctx->total[0] < (unsigned long) ilen )
+#endif /* PPC64 && LITTLE_ENDIAN */
         ctx->total[1]++;
 
     if( left && ilen >= fill )
@@ -324,8 +341,13 @@ static const unsigned char md5_padding[64] =
  */
 void md5_finish( md5_context *ctx, unsigned char output[16] )
 {
+#if defined(__PPC64__) && defined (__LITTLE_ENDIAN__)
+    unsigned int last, padn;
+    unsigned int high, low;
+#else
     unsigned long last, padn;
     unsigned long high, low;
+#endif /* PPC64 && LITTLE_ENDIAN */
     unsigned char msglen[8];
 
     high = ( ctx->total[0] >> 29 )

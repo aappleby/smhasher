@@ -251,7 +251,11 @@ static uint128 CityMurmur(const char *s, size_t len, uint128 seed) {
   uint64 b = Uint128High64(seed);
   uint64 c = 0;
   uint64 d = 0;
+#if defined(__PPC64__) && defined (__LITTLE_ENDIAN__)
+  signed int l = len - 16;
+#else
   signed long l = len - 16;
+#endif /* PPC64 && LITTLE_ENDIAN */
   if (l <= 0) {  // len <= 16
     a = ShiftMix(a * k1) * k1;
     c = b * k1 + HashLen0to16(s, len);

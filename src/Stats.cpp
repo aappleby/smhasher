@@ -88,7 +88,11 @@ void plot ( double n )
     printf(".");
   else
   {
+#if defined(__PPC64__) && defined (__LITTLE_ENDIAN__)
+    signed char x = '0' + (signed char)n3;
+#else
     char x = '0' + char(n3);
+#endif /* PPC64 && LITTLE_ENDIAN */
 
     if(x > '9') x = 'X';
 
