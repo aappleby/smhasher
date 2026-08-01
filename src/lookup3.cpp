@@ -1,4 +1,4 @@
-// lookup3 by Bob Jekins, code is public domain.
+// lookup3 by Bob Jenkins, code is public domain.
 
 #include "Platform.h"
 
