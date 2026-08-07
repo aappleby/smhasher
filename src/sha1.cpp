@@ -119,9 +119,9 @@ void SHA1_Transform(uint32_t state[5], const uint8_t buffer[64])
         uint8_t c[64];
         uint32_t l[16];
     } CHAR64LONG16;
-    CHAR64LONG16* block;
+    CHAR64LONG16 block[1];
 
-    block = (CHAR64LONG16*)buffer;
+    memcpy(block, buffer, sizeof(buffer));
 
     /* Copy context->state[] to working vars */
     a = state[0];
